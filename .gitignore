@@ -16,19 +16,12 @@ buildNumber.properties
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
 
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
+# For client
+node_modules
+dist
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-
-node_modules
-dist
-dist-ssr
-*.local
 
 # Editor directories and files
 .vscode/*
@@ -41,3 +34,10 @@ dist-ssr
 *.sln
 *.sw?
 
+# For IDEs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+dist-ssr
+*.local

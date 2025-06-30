@@ -11,16 +11,18 @@
 
 	<groupId>ru.epta</groupId>
 	<artifactId>mtplanner</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
+
 	<developers>
 		<developer/>
 	</developers>
 
 
 	<modules>
+		<module>commons</module>
 		<module>auth-service</module>
 		<module>meeting-service</module>
-	</modules>
+    </modules>
 
 	<packaging>pom</packaging>
 
@@ -49,6 +51,7 @@
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>

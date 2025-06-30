@@ -1,0 +1,4 @@
+datasource:
+  url: jdbc:postgresql://64.188.97.232:5432/mt_planner
+  username: mtp_admin
+  password: mtp_admin

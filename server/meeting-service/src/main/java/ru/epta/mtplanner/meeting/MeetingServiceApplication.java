@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-@EntityScan({"ru.epta.commons.dao.dto"})
+@EntityScan({"ru.epta.commons.dao.dto", "ru.epta.mtplanner.meeting.dao.dto"})
 @EnableJpaRepositories("ru.epta")
 @ComponentScan("ru.epta")
 @SpringBootApplication

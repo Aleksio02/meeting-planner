@@ -1,13 +1,15 @@
-import React from 'react';
-import '../styles/RegisterPage.css';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import "../styles/RegisterPage.css";
 
 const RegisterForm = () => {
+  const navigate = useNavigate();
+
   const handleLoginClick = () => {
-    window.location.href = '/login';
+    navigate("/login");
   };
 
   return (
-    <div className="register-container">
       <div className="register-card">
         <h1 className="register-title">Регистрация</h1>
         <input type="text" placeholder="Имя профиля" className="register-input" />
@@ -19,10 +21,15 @@ const RegisterForm = () => {
 
         <div className="register-footer">
           <span className="register-footer-text">Уже есть аккаунт?</span>
-          <span className="register-footer-link" onClick={handleLoginClick}>Войти</span>
+          <span
+            className="register-footer-link"
+            onClick={handleLoginClick}
+            style={{ cursor: "pointer" }}
+          >
+            Войти
+          </span>
         </div>
       </div>
-    </div>
   );
 };
 

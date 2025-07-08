@@ -1,0 +1,307 @@
+body * {
+  box-sizing: border-box;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(18, 18, 18, 0.66);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  position: relative;
+  width: 513px;
+  height: 830px;
+  background-color: #353535;
+  border-radius: 15px;
+}
+.input-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.event-title-input {
+  height: 49px;
+  width: 450px;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid white;
+  color: white;
+  font-family: "Open Sans", sans-serif;
+  font-weight: 400;
+  font-size: 36px;
+  margin: 25px 0 10px 0;
+  outline: none;
+}
+
+.event-title-input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+  font-family: "Open Sans", sans-serif;
+  font-weight: 400;
+  font-size: 36px;
+}
+
+.event-title-input:hover {
+  border-bottom-color: #fbb564;
+}
+.event-title-input:focus {
+  border-bottom-color: #fbb564;
+}
+
+.event-discription-input {
+  height: 250px;
+  width: 450px;
+  background-color: #2c2c2c;
+  border: none;
+  border-radius: 10px;
+  resize: none;
+  padding: 15px;
+  color: white;
+  font-family: "Open Sans", sans-serif;
+  font-weight: 400;
+  font-size: 24px;
+  outline: none;
+}
+
+.event-discription-input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+  font-family: "Open Sans", sans-serif;
+  font-weight: 400;
+  font-size: 24px;
+}
+.event-discription-input:focus {
+  outline: 2px solid #fbb564;
+}
+.event-discription-input:hover {
+   outline: 2px solid #fbb564;
+}
+
+.icon-time {
+  width: 39px;
+  height: 39px;
+  margin-left: 32px;
+  margin-top: 20px;
+}
+.inputs-row {
+  display: flex;
+  align-items: center;
+}
+.time-separator {
+  color: white;
+  font-size: 36px;
+  margin-left: 15px;
+  margin-top: 15px;
+  margin-right: 15px;
+  margin-bottom: 30px;
+}
+
+.icon-user {
+  width: 39px;
+  height: 39px;
+  margin-left: 35px;
+  margin-top: 20px;
+  margin-right: 5px;
+}
+
+.user-input {
+  margin-top: 17px;
+  width: 280px;
+  height: 37px;
+  border-radius: 5px;
+  background-color: #2c2c2c;
+  padding: 15px;
+  font-family: "Open Sans", sans-serif;
+  color: white;
+  font-size: 16px;
+  border: none;
+  box-shadow: none;
+  margin-right: 5px;
+  outline: none; /* не нужен outline по умолчанию */
+}
+
+.user-input:hover,
+.user-input:focus {
+  outline: 2px solid #fbb564; /* здесь задаём кастомный outline */
+}
+
+.user-input::placeholder {
+  font-family: "Open Sans", sans-serif;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 16px;
+}
+
+.add-button {
+  height: 37px;
+  width: 98px;
+  background-color: #2c2c2c;
+  border-radius: 5px;
+  outline: none;
+  font-family: "Open Sans", sans-serif;
+  color: rgba(255, 255, 255, 0.7);
+  border: none;
+  font-weight: 600;
+  box-shadow: none;
+  font-size: 16px;
+  margin-top: 17px;
+  cursor: pointer;
+}
+
+.add-button:hover {
+  background-color: #fbb564;
+  color: white;
+}
+.add-button:active {
+  background-color: #f8cfa1;
+}
+
+.datepicker-input {
+  margin-top: 20px;
+  margin-left: 17px;
+  margin-right: 15px;
+  width: 188px;
+  height: 39px;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  background-color: #272626;
+  color: white;
+  font-family: "Open Sans", sans-serif;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.datepicker-input:hover,
+.datepicker-input:focus {
+  outline: 2px solid #fbb564;
+}
+.event-calendar {
+  background-color: #2c2c2c;
+  color: white;
+  border: 1px solid #fbb564;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  font-family: "Open Sans", sans-serif;
+}
+.event-calendar .react-datepicker__month-container {
+  background-color: #2c2c2c;
+}
+.event-calendar .react-datepicker__day-name {
+  color: white !important;
+}
+
+.event-calendar .react-datepicker__day {
+  color: white;
+}
+
+.event-calendar .react-datepicker__day:hover {
+  background-color: white;
+  color: black;
+  border-radius: 5px;
+}
+
+.event-calendar .react-datepicker__day--selected,
+.event-calendar .react-datepicker__day--keyboard-selected {
+  background-color: #fbb564;
+  color: black;
+  border-radius: 5px;
+}
+
+.event-calendar .react-datepicker__current-month {
+  color: white;
+}
+
+.event-calendar .react-datepicker__navigation-icon {
+  border-color: white;
+}
+
+.event-calendar .react-datepicker__header {
+  background-color: #2c2c2c !important;
+  border-bottom: none !important;
+}
+
+.column-layout {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.email-add-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.email-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding-left: 30px;
+  padding-right: 20px;
+}
+
+.email-tag {
+  background-color: #2c2c2c;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 19px;
+  border: 1px solid #fbb564;
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  
+  
+}
+
+.remove-tag {
+  background: none;
+  border: none;
+  color: #fbb564;
+  font-size: 16px;
+  margin-left: 8px;
+  cursor: pointer;
+}
+.remove-tag:hover {
+  color: red;
+}
+
+.limit-warning {
+  color: #fbb564;
+  font-size: 14px;
+  margin-top: 20px;
+  font-family: "Open Sans", sans-serif;
+  margin-left: 130px;
+}
+
+.event-create {
+  position: absolute;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 60px;
+  width: 400px;
+  border-radius: 10px;
+  background-color: #272626;
+  border: none;
+  color: white;
+  font-family: "Open Sans", sans-serif;
+  font-size: 32px;
+  font-weight: 600;
+  z-index: 10; /* на всякий случай */
+}
+
+
+.event-create:hover{
+  background-color: #fbb564;
+}
+
+.event-create:active {
+  background-color: #f8cfa1;
+}

@@ -1,4 +1,4 @@
-package ru.epta.mtplanner.auth.model;
+package ru.epta.mtplanner.auth.model.request;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,4 +1,4 @@
-package ru.epta.commons.exception;
+package ru.epta.mtplanner.commons.exception;
 
 public class IncorrectRequestDataException extends RuntimeException {
     public IncorrectRequestDataException(String message) {

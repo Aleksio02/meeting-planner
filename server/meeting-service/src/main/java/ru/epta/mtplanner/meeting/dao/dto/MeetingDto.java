@@ -3,8 +3,8 @@ package ru.epta.mtplanner.meeting.dao.dto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import ru.epta.commons.dao.dto.AbstractEntityDto;
-import ru.epta.commons.dao.dto.UserDto;
+import ru.epta.mtplanner.commons.dao.dto.AbstractEntityDto;
+import ru.epta.mtplanner.commons.dao.dto.UserDto;
 
 import java.time.LocalDateTime;
 

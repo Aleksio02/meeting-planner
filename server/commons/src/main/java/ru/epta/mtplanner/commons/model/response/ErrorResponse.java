@@ -1,4 +1,4 @@
-package ru.epta.commons.model.response;
+package ru.epta.mtplanner.commons.model.response;
 
 import lombok.Builder;
 import lombok.Data;

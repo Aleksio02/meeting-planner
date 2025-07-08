@@ -1,4 +1,4 @@
-package ru.epta.commons.model;
+package ru.epta.mtplanner.commons.model;
 
 import java.util.UUID;
 

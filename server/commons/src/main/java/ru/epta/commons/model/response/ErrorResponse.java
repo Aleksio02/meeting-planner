@@ -1,4 +1,4 @@
-package ru.epta.commons.model;
+package ru.epta.commons.model.response;
 
 import lombok.Builder;
 import lombok.Data;
@@ -7,5 +7,5 @@ import lombok.Data;
 @Builder
 public class ErrorResponse {
     private int errorCode;
-    private String errorMesage;
+    private String errorMessage;
 }

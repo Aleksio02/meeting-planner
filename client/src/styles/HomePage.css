@@ -1,0 +1,23 @@
+.create-button {
+    position: absolute;
+    left: 65px;
+    /* x */
+    top: 130px;
+    /* y */
+    width: 370px;
+    height: 115px;
+    background-color: #555352;
+    border: none;
+    border-radius: 20px;
+    color: white;
+    font-size: 48px;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 800;
+    /* ExtraBold */
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.create-button:hover {
+    background-color: #fbb564;
+}

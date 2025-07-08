@@ -1,5 +1,7 @@
 package ru.epta.mtplanner.meeting.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -9,6 +11,7 @@ import ru.epta.mtplanner.meeting.model.Meeting;
 import ru.epta.mtplanner.meeting.model.request.GetListMeetingRequest;
 import ru.epta.mtplanner.meeting.service.MeetingService;
 
+
 @RestController
 @RequestMapping("/api/meetings")
 public class MeetingController {
@@ -16,6 +19,12 @@ public class MeetingController {
 
     public MeetingController(MeetingService meetingService) {this.meetingService = meetingService;}
 
+    @Operation(summary = "Получить список событий",
+        description = """
+        Получить список событий по фильтрам.\n
+        Примечания:\n
+        Параметры limit, offset, sortBy и sortDirection имеют стандартные значения, поэтому их можно не указывать!
+        """)
     @GetMapping
     public List<Meeting> getListMeetingRequest(@ModelAttribute GetListMeetingRequest request) {
         return meetingService.getListMeeting(request);

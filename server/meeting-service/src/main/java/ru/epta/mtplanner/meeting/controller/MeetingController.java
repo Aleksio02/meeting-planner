@@ -11,7 +11,7 @@ import ru.epta.mtplanner.meeting.model.Meeting;
 import ru.epta.mtplanner.meeting.model.request.GetListMeetingRequest;
 import ru.epta.mtplanner.meeting.service.MeetingService;
 
-
+@Tag(name = "События")
 @RestController
 @RequestMapping("/api/meetings")
 public class MeetingController {

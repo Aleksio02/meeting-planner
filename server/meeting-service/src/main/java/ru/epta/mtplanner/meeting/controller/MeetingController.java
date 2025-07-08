@@ -10,13 +10,13 @@ import ru.epta.mtplanner.meeting.model.request.GetListMeetingRequest;
 import ru.epta.mtplanner.meeting.service.MeetingService;
 
 @RestController
-@RequestMapping("/meeting")
+@RequestMapping("/api/meetings")
 public class MeetingController {
     private final MeetingService meetingService;
 
     public MeetingController(MeetingService meetingService) {this.meetingService = meetingService;}
 
-    @GetMapping("/list")
+    @GetMapping
     public List<Meeting> getListMeetingRequest(@ModelAttribute GetListMeetingRequest request) {
         return meetingService.getListMeeting(request);
     }

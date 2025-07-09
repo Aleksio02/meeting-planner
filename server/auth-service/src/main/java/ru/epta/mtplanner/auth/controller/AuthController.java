@@ -12,7 +12,6 @@ public class AuthController {
 
     public AuthController(AuthService authService) {this.authService = authService;}
 
-    @ResponseBody
     @PostMapping("/login")
     public User login(@RequestBody Authorization request) {
         return authService.login(request);

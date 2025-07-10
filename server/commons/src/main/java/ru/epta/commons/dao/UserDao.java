@@ -12,5 +12,9 @@ import java.util.UUID;
 public interface UserDao extends JpaRepository<UserDto, UUID>, JpaSpecificationExecutor<UserDto> {
     Optional<UserDto> findByUsername(String username);
 
-    Optional<UserDto> findByEmail(String email);
+    Optional<UserDto> findByUsernameOrEmail(String username, String email);
+
+    default Optional<UserDto> findByUsernameOrEmail(String login){
+        return findByUsernameOrEmail(login, login);
+    }
 }

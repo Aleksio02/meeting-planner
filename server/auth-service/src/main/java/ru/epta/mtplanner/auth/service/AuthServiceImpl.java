@@ -8,35 +8,39 @@ import ru.epta.commons.dao.dto.UserDto;
 import ru.epta.commons.exception.UnauthorizedException;
 import ru.epta.commons.model.User;
 import ru.epta.mtplanner.auth.hash.PasswordEncoder;
+import ru.epta.mtplanner.auth.jwt.JwtUtils;
 import ru.epta.mtplanner.auth.model.request.Authorization;
+import ru.epta.mtplanner.auth.model.response.AuthResponse;
 
 @Primary
 @Service
 public class AuthServiceImpl implements AuthService {
 
     private final UserDao userDao;
-    private final UserConverter userConverter;
 
-    public AuthServiceImpl(UserDao userDao, UserConverter userConverter) {
+    private final JwtUtils jwtUtils;
+
+    public AuthServiceImpl(UserDao userDao, JwtUtils jwtUtils) {
         this.userDao = userDao;
-        this.userConverter = userConverter;
+        this.jwtUtils = jwtUtils;
     }
 
     @Override
-    public User login(Authorization request) {
+    public AuthResponse login(Authorization request) {
         String login = request.getLogin();
         String password = request.getPassword();
 
         UserDto userDto = userDao.findByUsernameOrEmail(login)
-                .orElseThrow(() -> new UnauthorizedException("User not find"));
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
 
         if (!PasswordEncoder.matches(password, userDto.getPassword())) {
             throw new UnauthorizedException("Invalid password");
         }
 
         User user = new User();
-        userConverter.fromDto(userDto, user);
+        new UserConverter().fromDto(userDto, user);
 
-        return user;
+        String token = jwtUtils.generateToken(request.getLogin());
+        return new AuthResponse(token, user);
     }
 }

@@ -1,11 +1,13 @@
-package ru.epta.mtplanner.auth.model.request;
+package ru.epta.mtplanner.auth.model.response;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import ru.epta.commons.model.User;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class AuthResponse {
     private String token;
     private User user;

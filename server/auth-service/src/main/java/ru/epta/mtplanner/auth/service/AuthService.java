@@ -1,10 +1,10 @@
 package ru.epta.mtplanner.auth.service;
 
 import org.springframework.stereotype.Service;
-import ru.epta.commons.model.User;
 import ru.epta.mtplanner.auth.model.request.Authorization;
+import ru.epta.mtplanner.auth.model.response.AuthResponse;
 
 @Service
 public interface AuthService {
-    User login(Authorization request);
+    AuthResponse login(Authorization request);
 }

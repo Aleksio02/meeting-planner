@@ -5,8 +5,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.epta.commons.model.User;
 import ru.epta.mtplanner.auth.model.request.Authorization;
+import ru.epta.mtplanner.auth.model.response.AuthResponse;
 import ru.epta.mtplanner.auth.service.AuthService;
 
 @RestController
@@ -19,7 +19,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public User login(@Valid @RequestBody Authorization request) {
+    public AuthResponse login(@Valid @RequestBody Authorization request) {
         return authService.login(request);
     }
 }

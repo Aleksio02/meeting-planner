@@ -8,7 +8,7 @@ import ru.epta.commons.dao.dto.UserDto;
 import ru.epta.commons.exception.UnauthorizedException;
 import ru.epta.commons.model.User;
 import ru.epta.mtplanner.auth.hash.PasswordEncoder;
-import ru.epta.mtplanner.auth.jwt.JwtUtils;
+import ru.epta.mtplanner.auth.utils.JwtUtils;
 import ru.epta.mtplanner.auth.model.request.Authorization;
 import ru.epta.mtplanner.auth.model.response.AuthResponse;
 
@@ -40,7 +40,7 @@ public class AuthServiceImpl implements AuthService {
         User user = new User();
         new UserConverter().fromDto(userDto, user);
 
-        String token = jwtUtils.generateToken(user.getId(), user.getUsername(), user.getEmail());
+        String token = jwtUtils.generateToken(user);
         return new AuthResponse(token, user);
     }
 }

@@ -1,4 +1,4 @@
-package ru.epta.mtplanner.auth.jwt;
+package ru.epta.mtplanner.auth.utils;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -12,11 +12,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import ru.epta.commons.model.User;
 
 @Component
 public class JwtUtils {
 
-    private static final String privateKeyPath = "jwtRS256.pk8";
+    private static final String PRIVATE_KEY_PATH = "jwtRS256.pk8";
+    private static final String KEY_TYPE = "RSA";
     private final PrivateKey privateKey;
 
     public JwtUtils() {
@@ -24,15 +26,15 @@ public class JwtUtils {
     }
 
     private PrivateKey loadPrivateKey() {
-        try {
-            InputStream inputStream = getClass().getClassLoader().getResourceAsStream(privateKeyPath);
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(PRIVATE_KEY_PATH)){
+
             if (inputStream == null) {
                 throw new RuntimeException("Key not found in resources");
             }
             byte[] keyBytes = inputStream.readAllBytes();
 
             PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
-            KeyFactory kf = KeyFactory.getInstance("RSA");
+            KeyFactory kf = KeyFactory.getInstance(KEY_TYPE);
             return kf.generatePrivate(spec);
 
         } catch (Exception e) {
@@ -40,15 +42,15 @@ public class JwtUtils {
         }
     }
 
-    public String generateToken(UUID id, String username, String email) {
+    public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("id", id);
-        claims.put("username", username);
-        claims.put("email", email);
+        claims.put("id", user.getId());
+        claims.put("username", user.getUsername());
+        claims.put("email", user.getEmail());
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(username)
+                .setSubject(user.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 3600000))
                 .signWith(this.privateKey, SignatureAlgorithm.RS256)

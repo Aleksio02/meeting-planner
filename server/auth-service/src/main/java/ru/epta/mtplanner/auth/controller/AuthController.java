@@ -10,7 +10,7 @@ import ru.epta.mtplanner.auth.model.response.AuthResponse;
 import ru.epta.mtplanner.auth.service.AuthService;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
     private final AuthService authService;
 

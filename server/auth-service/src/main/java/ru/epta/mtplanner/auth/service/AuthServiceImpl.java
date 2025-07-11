@@ -2,11 +2,11 @@ package ru.epta.mtplanner.auth.service;
 
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
-import ru.epta.commons.converter.UserConverter;
-import ru.epta.commons.dao.UserDao;
-import ru.epta.commons.dao.dto.UserDto;
-import ru.epta.commons.exception.UnauthorizedException;
-import ru.epta.commons.model.User;
+import ru.epta.mtplanner.commons.converter.UserConverter;
+import ru.epta.mtplanner.commons.dao.UserDao;
+import ru.epta.mtplanner.commons.dao.dto.UserDto;
+import ru.epta.mtplanner.commons.exception.UnauthorizedException;
+import ru.epta.mtplanner.commons.model.User;
 import ru.epta.mtplanner.auth.hash.PasswordEncoder;
 import ru.epta.mtplanner.auth.utils.JwtUtils;
 import ru.epta.mtplanner.auth.model.request.Authorization;

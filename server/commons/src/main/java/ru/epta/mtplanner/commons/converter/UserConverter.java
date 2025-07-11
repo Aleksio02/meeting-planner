@@ -1,7 +1,7 @@
-package ru.epta.commons.converter;
+package ru.epta.mtplanner.commons.converter;
 
-import ru.epta.commons.dao.dto.UserDto;
-import ru.epta.commons.model.User;
+import ru.epta.mtplanner.commons.dao.dto.UserDto;
+import ru.epta.mtplanner.commons.model.User;
 
 public class UserConverter {
     public void fromDto(UserDto source, User destination) {

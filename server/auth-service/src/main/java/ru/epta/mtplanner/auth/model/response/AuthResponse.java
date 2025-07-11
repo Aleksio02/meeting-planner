@@ -1,7 +1,7 @@
 package ru.epta.mtplanner.auth.model.response;
 
 import lombok.*;
-import ru.epta.commons.model.User;
+import ru.epta.mtplanner.commons.model.User;
 
 @Getter
 @Setter

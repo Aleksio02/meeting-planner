@@ -52,7 +52,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Async
-    protected void sendCodeToMail(String code, String receiver) {
+    protected void sendCodeToMail(String receiver, String code) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(SOURCE_EMAIL);
         message.setSubject("Активация аккаунта");

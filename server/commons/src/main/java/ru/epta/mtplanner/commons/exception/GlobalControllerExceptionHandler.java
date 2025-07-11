@@ -1,4 +1,4 @@
-package ru.epta.commons.exception;
+package ru.epta.mtplanner.commons.exception;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -7,7 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
-import ru.epta.commons.model.response.ErrorResponse;
+import ru.epta.mtplanner.commons.model.response.ErrorResponse;
 
 import java.util.stream.Collectors;
 

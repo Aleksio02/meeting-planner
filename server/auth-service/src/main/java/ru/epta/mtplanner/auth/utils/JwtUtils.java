@@ -2,8 +2,6 @@ package ru.epta.mtplanner.auth.utils;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.stereotype.Component;
-
 import java.io.InputStream;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
@@ -11,8 +9,8 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
-import ru.epta.commons.model.User;
+import org.springframework.stereotype.Component;
+import ru.epta.mtplanner.commons.model.User;
 
 @Component
 public class JwtUtils {

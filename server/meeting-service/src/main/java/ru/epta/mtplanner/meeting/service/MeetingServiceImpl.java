@@ -24,6 +24,9 @@ public class MeetingServiceImpl implements MeetingService {
 
     @Override
     public List<Meeting> getListMeeting(GetListMeetingRequest request) {
+        if (request == null) {
+            request = new GetListMeetingRequest();
+        }
         Pageable pageable = PageRequest.of(
             request.getOffset() / request.getLimit(),
             request.getLimit(),

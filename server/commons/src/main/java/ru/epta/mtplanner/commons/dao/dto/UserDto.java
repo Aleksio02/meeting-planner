@@ -1,4 +1,4 @@
-package ru.epta.commons.dao.dto;
+package ru.epta.mtplanner.commons.dao.dto;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

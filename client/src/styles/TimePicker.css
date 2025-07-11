@@ -1,0 +1,92 @@
+.timepicker-container {
+  position: relative;
+  margin-top: 20px;
+}
+
+.timepicker-button {
+  width: 70px;
+  height: 40px;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  background-color: #272626;
+  color: white;
+  font-family: "Open Sans", sans-serif;
+  cursor: pointer;
+  font-size: 16px;
+  text-align: center;
+}
+.timepicker-button:hover {
+  border-color: #fbb564;
+}
+
+.timepicker-list {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  right: 0;
+  max-height: 150px;
+  overflow-y: auto;
+  background-color: #353535;
+  border-radius: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  z-index: 100000000;
+  border: 1px solid #fbb564;
+
+  scrollbar-width: thin;
+  scrollbar-color: #fbb564 #353535;
+}
+
+.timepicker-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.timepicker-list::-webkit-scrollbar-track {
+  background: #353535;
+  border-radius: 5px;
+}
+
+.timepicker-list::-webkit-scrollbar-thumb {
+  background-color: #fbb564;
+  border-radius: 5px;
+  border: 2px solid #353535;
+}
+
+.timepicker-list::-webkit-scrollbar-thumb:hover {
+  background-color: #ffca7a;
+}
+
+.timepicker-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  color: white;
+  border-bottom: 1px solid #444;
+}
+
+.timepicker-item:hover {
+  background-color: #fbb564;
+}
+.timepicker-input {
+  width: 70px;
+  height: 39px;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  background-color: #272626;
+  color: white;
+  font-family: "Open Sans", sans-serif;
+  cursor: text;
+  font-size: 16px;
+  text-align: center;
+  
+}
+
+.timepicker-input:hover {
+  outline: 2px solid #fbb564;
+}
+
+.timepicker-input:focus {
+  outline: 2px solid #fbb564;
+}

@@ -6,3 +6,15 @@ spring:
     url: jdbc:postgresql://64.188.97.232:5432/mt_planner
     username: mtp_admin
     password: mtp_admin
+  mail:
+    protocol: smtps
+    host: smtp.yandex.ru
+    port: 465
+    username: meetingplanner@yandex.ru
+    password: engmwuljsdexikqh
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true

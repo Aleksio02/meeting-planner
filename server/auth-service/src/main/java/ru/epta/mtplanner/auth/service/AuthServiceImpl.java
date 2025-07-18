@@ -1,5 +1,6 @@
 package ru.epta.mtplanner.auth.service;
 
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.mail.SimpleMailMessage;
@@ -48,6 +49,21 @@ public class AuthServiceImpl implements AuthService {
         new UserConverter().fromDto(userDto, user);
 
         String token = jwtUtils.generateToken(user);
+        return new AuthResponse(token, user);
+    }
+
+    @Override
+    public AuthResponse validate(String token) {
+
+        Claims claims = jwtUtils.parseToken(token);
+        String username = claims.getSubject();
+
+        UserDto userDto = userDao.findByUsername(username)
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
+
+        User user = new User();
+        new UserConverter().fromDto(userDto, user);
+
         return new AuthResponse(token, user);
     }
 

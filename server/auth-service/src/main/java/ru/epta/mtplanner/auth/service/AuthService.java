@@ -7,4 +7,6 @@ import ru.epta.mtplanner.auth.model.response.AuthResponse;
 @Service
 public interface AuthService {
     AuthResponse login(Authorization request);
+
+    AuthResponse validate(String token);
 }

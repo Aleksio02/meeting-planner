@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.epta.mtplanner.auth.model.request.Authorization;
+import ru.epta.mtplanner.auth.model.request.TokenRequest;
 import ru.epta.mtplanner.auth.model.response.AuthResponse;
 import ru.epta.mtplanner.auth.service.AuthService;
 
@@ -21,5 +22,10 @@ public class AuthController {
     @PostMapping("/login")
     public AuthResponse login(@Valid @RequestBody Authorization request) {
         return authService.login(request);
+    }
+
+    @PostMapping("/validate")
+    public AuthResponse validate(@Valid @RequestBody TokenRequest request) {
+        return authService.validate(request.getToken());
     }
 }

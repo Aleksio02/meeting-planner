@@ -16,6 +16,6 @@ public class MeetingConverter {
 
         destination.setStartsAt(source.getStartsAt());
         destination.setDuration(source.getDuration());
-        destination.setStatus(source.getStatus());
+        destination.setStatus(source.getStatus().getStatus());
     }
 }

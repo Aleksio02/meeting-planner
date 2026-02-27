@@ -35,4 +35,8 @@ public class SessionUtils {
     public TokenPayload getSession(String sessionId) {
         return redisTemplate.opsForValue().get(sessionId);
     }
+
+    public void deleteSession(String sessionId) {
+        redisTemplate.opsForValue().getAndDelete(sessionId);
+    }
 }

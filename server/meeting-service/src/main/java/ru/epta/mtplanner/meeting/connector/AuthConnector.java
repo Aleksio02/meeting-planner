@@ -6,8 +6,7 @@ import ru.epta.mtplanner.commons.model.User;
 
 @FeignClient(value = "auth-service", url = "http://localhost:8081")
 public interface AuthConnector {
-    // TODO: aleksioi: добавить аннотацию на тип данных запроса и согласовать контракт
-    // (в каком виде отправлять токен, в JSON или строкой и т.д.)
-    @PostMapping("/api/auth/validate")
-    User validate(String token);
+    // TODO: aleksioi: возвращает TokenPayload (ждать мержа TASK-021)
+    @PostMapping("/api/auth/validateSession")
+    User validateSession(String token);
 }

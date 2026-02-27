@@ -18,3 +18,15 @@ spring:
           auth: true
           ssl:
             enable: true
+  data:
+    redis:
+      host: 64.188.97.232
+      port: 6379
+      password: mtp_token
+      database: 0
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0

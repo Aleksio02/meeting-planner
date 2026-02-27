@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import ru.epta.mtplanner.commons.dao.dto.AbstractEntityDto;
 import ru.epta.mtplanner.commons.dao.dto.UserDto;
+import ru.epta.mtplanner.meeting.model.enums.MeetingStatus;
 
 import java.time.LocalDateTime;
 
@@ -31,5 +32,5 @@ public class MeetingDto extends AbstractEntityDto {
     private int duration;
 
     @Column
-    private String status;
+    private MeetingStatus status;
 }

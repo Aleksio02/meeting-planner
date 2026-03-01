@@ -1,7 +1,5 @@
 package ru.epta.mtplanner.auth.service;
 
-import java.time.Instant;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.mail.SimpleMailMessage;
@@ -13,7 +11,6 @@ import ru.epta.mtplanner.auth.hash.PasswordEncoder;
 import ru.epta.mtplanner.auth.model.TokenPayload;
 import ru.epta.mtplanner.auth.model.request.Authorization;
 import ru.epta.mtplanner.auth.model.response.AuthResponse;
-import ru.epta.mtplanner.auth.utils.JwtUtils;
 import ru.epta.mtplanner.auth.utils.SessionUtils;
 import ru.epta.mtplanner.commons.converter.UserConverter;
 import ru.epta.mtplanner.commons.dao.UserDao;
@@ -23,6 +20,9 @@ import ru.epta.mtplanner.commons.exception.IncorrectRequestDataException;
 import ru.epta.mtplanner.commons.exception.UnauthorizedException;
 import ru.epta.mtplanner.commons.model.User;
 
+import java.time.Instant;
+import java.util.Optional;
+
 @Primary
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -30,13 +30,11 @@ public class AuthServiceImpl implements AuthService {
     @Value("${spring.mail.username}")
     private String SOURCE_EMAIL;
     private final UserDao userDao;
-    private final JwtUtils jwtUtils;
     private final JavaMailSender mailSender;
     private final SessionUtils sessionUtils;
 
-    public AuthServiceImpl(UserDao userDao, JwtUtils jwtUtils, JavaMailSender mailSender, SessionUtils sessionUtils) {
+    public AuthServiceImpl(UserDao userDao, JavaMailSender mailSender, SessionUtils sessionUtils) {
         this.userDao = userDao;
-        this.jwtUtils = jwtUtils;
         this.mailSender = mailSender;
         this.sessionUtils = sessionUtils;
     }
@@ -56,7 +54,7 @@ public class AuthServiceImpl implements AuthService {
         User user = new User();
         new UserConverter().fromDto(userDto, user);
 
-        String token = jwtUtils.generateToken(user);
+        String token = sessionUtils.createSession(userDto.getId());
         return new AuthResponse(token, user);
     }
 
@@ -73,8 +71,12 @@ public class AuthServiceImpl implements AuthService {
         UserDto newUser = new UserDto();
         new AuthConverter().toDto(request, newUser);
         newUser = userDao.save(newUser);
+
+        User user = new User();
+        new UserConverter().fromDto(newUser, user);
+
         String sessionId = sessionUtils.createSession(newUser.getId());
-        return new AuthResponse(sessionId, null);
+        return new AuthResponse(sessionId, user);
     }
 
     @Override

@@ -4,10 +4,9 @@ import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-import ru.epta.mtplanner.auth.model.TokenPayload;
+import ru.epta.mtplanner.commons.model.TokenPayload;
 
 @Component
 public class SessionUtils {

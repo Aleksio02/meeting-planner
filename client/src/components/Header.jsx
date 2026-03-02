@@ -1,8 +1,11 @@
-// src/components/Header.jsx
-import React from 'react';
+import React, { useState, useRef } from 'react';
+import NotificationsModal from './NotificationsModal';
 import '../styles/Header.css';
 
 const Header = () => {
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const notificationBtnRef = useRef(null);
+
   return (
     <header className="header">
       <div className="header-left">
@@ -20,15 +23,17 @@ const Header = () => {
             src="/src/assets/invitations.svg" 
             alt="Invitations"
           />
-        
         </button>
 
-        <button className="notification-btn">
+        <button 
+          className="notification-btn"
+          ref={notificationBtnRef}
+          onClick={() => setIsNotificationsOpen(true)}
+        >
           <img 
             src="/src/assets/notification.svg" 
             alt="Notifications"
           />
-          
         </button>
         
         <div className="user-profile">
@@ -41,6 +46,12 @@ const Header = () => {
           </div>
         </div>
       </div>
+
+      <NotificationsModal 
+        isOpen={isNotificationsOpen}
+        onClose={() => setIsNotificationsOpen(false)}
+        anchorRef={notificationBtnRef}
+      />
     </header>
   );
 };

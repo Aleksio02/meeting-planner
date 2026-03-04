@@ -14,6 +14,7 @@ import ru.epta.mtplanner.auth.model.response.AuthResponse;
 import ru.epta.mtplanner.auth.utils.SessionUtils;
 import ru.epta.mtplanner.commons.converter.UserConverter;
 import ru.epta.mtplanner.commons.dao.UserDao;
+import ru.epta.mtplanner.commons.dao.dto.ProfileDto;
 import ru.epta.mtplanner.commons.dao.dto.UserDto;
 import ru.epta.mtplanner.commons.exception.AlreadyExistsException;
 import ru.epta.mtplanner.commons.exception.IncorrectRequestDataException;
@@ -71,6 +72,9 @@ public class AuthServiceImpl implements AuthService {
         UserDto newUser = new UserDto();
         new AuthConverter().toDto(request, newUser);
         newUser = userDao.save(newUser);
+
+        ProfileDto profile = new ProfileDto();
+        profile.setId(newUser.getId());
 
         User user = new User();
         new UserConverter().fromDto(newUser, user);

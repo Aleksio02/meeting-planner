@@ -13,6 +13,7 @@ import ru.epta.mtplanner.auth.model.request.Authorization;
 import ru.epta.mtplanner.auth.model.response.AuthResponse;
 import ru.epta.mtplanner.auth.utils.SessionUtils;
 import ru.epta.mtplanner.commons.converter.UserConverter;
+import ru.epta.mtplanner.commons.dao.ProfileDao;
 import ru.epta.mtplanner.commons.dao.UserDao;
 import ru.epta.mtplanner.commons.dao.dto.ProfileDto;
 import ru.epta.mtplanner.commons.dao.dto.UserDto;
@@ -31,11 +32,13 @@ public class AuthServiceImpl implements AuthService {
     @Value("${spring.mail.username}")
     private String SOURCE_EMAIL;
     private final UserDao userDao;
+    private final ProfileDao profileDao;
     private final JavaMailSender mailSender;
     private final SessionUtils sessionUtils;
 
-    public AuthServiceImpl(UserDao userDao, JavaMailSender mailSender, SessionUtils sessionUtils) {
+    public AuthServiceImpl(UserDao userDao, ProfileDao profileDao, JavaMailSender mailSender, SessionUtils sessionUtils) {
         this.userDao = userDao;
+        this.profileDao = profileDao;
         this.mailSender = mailSender;
         this.sessionUtils = sessionUtils;
     }
@@ -75,6 +78,7 @@ public class AuthServiceImpl implements AuthService {
 
         ProfileDto profile = new ProfileDto();
         profile.setId(newUser.getId());
+        profileDao.save(profile);
 
         User user = new User();
         new UserConverter().fromDto(newUser, user);

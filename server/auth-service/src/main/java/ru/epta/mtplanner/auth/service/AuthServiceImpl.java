@@ -22,8 +22,6 @@ import ru.epta.mtplanner.commons.exception.IncorrectRequestDataException;
 import ru.epta.mtplanner.commons.exception.UnauthorizedException;
 import ru.epta.mtplanner.commons.model.User;
 
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.Instant;
 import java.util.Optional;
 
@@ -65,7 +63,6 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    @Transactional
     public AuthResponse register(Authorization request) {
         if (!request.validToRegistration()) {
             throw new IncorrectRequestDataException("You should fill all fields!");

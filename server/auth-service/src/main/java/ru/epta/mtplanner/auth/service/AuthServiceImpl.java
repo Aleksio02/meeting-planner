@@ -1,5 +1,7 @@
 package ru.epta.mtplanner.auth.service;
 
+import java.time.Instant;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.mail.SimpleMailMessage;
@@ -15,15 +17,11 @@ import ru.epta.mtplanner.auth.utils.SessionUtils;
 import ru.epta.mtplanner.commons.converter.UserConverter;
 import ru.epta.mtplanner.commons.dao.ProfileDao;
 import ru.epta.mtplanner.commons.dao.UserDao;
-import ru.epta.mtplanner.commons.dao.dto.ProfileDto;
 import ru.epta.mtplanner.commons.dao.dto.UserDto;
 import ru.epta.mtplanner.commons.exception.AlreadyExistsException;
 import ru.epta.mtplanner.commons.exception.IncorrectRequestDataException;
 import ru.epta.mtplanner.commons.exception.UnauthorizedException;
 import ru.epta.mtplanner.commons.model.User;
-
-import java.time.Instant;
-import java.util.Optional;
 
 @Primary
 @Service

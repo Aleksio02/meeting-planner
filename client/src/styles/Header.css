@@ -1,0 +1,189 @@
+/* src/styles/Header.css */
+.header {
+  height: 130px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 60px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  height: 100%;
+}
+
+.logo {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+}
+
+.app-name {
+  color: #fbb564;
+  font-size: 29px;
+  font-weight: 900;
+  font-family: "Open Sans", sans-serif;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  height: 100%;
+}
+
+.invitations-btn,
+.notification-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+  height: 50px;
+  width: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.invitations-btn img,
+.notification-btn img {
+  width: 50px;
+  height: 50px;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  height: 100%;
+}
+
+.username {
+  color: #fbb564;
+  font-size: 20px;
+  font-weight: 600;
+  font-family: "Open Sans", sans-serif;
+}
+
+.avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* === АДАПТИВНОСТЬ === */
+@media (max-width: 1024px) {
+  .header {
+    padding: 0 40px;
+  }
+  
+  .logo {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .app-name {
+    font-size: 24px;
+  }
+  
+  .avatar {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .username {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    height: 100px;
+    padding: 0 20px;
+  }
+  
+  .logo {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .app-name {
+    font-size: 20px;
+    display: none;
+  }
+  
+  .header-left {
+    gap: 5px;
+  }
+  
+  .invitations-btn,
+  .notification-btn {
+    height: 40px;
+    width: 40px;
+    padding: 8px;
+  }
+  
+  .invitations-btn img,
+  .notification-btn img {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .username {
+    display: none;
+  }
+  
+  .avatar {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    height: 80px;
+    padding: 0 15px;
+  }
+  
+  .logo {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .invitations-btn,
+  .notification-btn {
+    height: 35px;
+    width: 35px;
+    padding: 6px;
+  }
+  
+  .invitations-btn img,
+  .notification-btn img {
+    width: 25px;
+    height: 25px;
+  }
+  
+  .avatar {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .header-right {
+    gap: 10px;
+  }
+}

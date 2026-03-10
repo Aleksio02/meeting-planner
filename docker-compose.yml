@@ -1,0 +1,19 @@
+services:
+  postgres:
+    container_name: mtp_db
+    image: postgres
+    environment:
+      POSTGRES_DB: mt_planner
+      POSTGRES_USER: mtp_admin
+      POSTGRES_PASSWORD: mtp_admin
+      PGDATA: /data/postgres
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  redis:
+    container_name: mtp_cache
+    image: redis:8.6.1-alpine
+    command: redis-server --save 20 1 --loglevel warning --requirepass mtp_token
+    ports:
+      - "6379:6379"

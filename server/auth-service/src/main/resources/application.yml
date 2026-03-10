@@ -1,2 +1,32 @@
 server:
   port: 8081
+
+spring:
+  datasource:
+    url: jdbc:postgresql://64.188.97.232:5432/mt_planner
+    username: mtp_admin
+    password: mtp_admin
+  mail:
+    protocol: smtps
+    host: smtp.yandex.ru
+    port: 465
+    username: meetingplanner@yandex.ru
+    password: engmwuljsdexikqh
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+  data:
+    redis:
+      host: 64.188.97.232
+      port: 6379
+      password: mtp_token
+      database: 0
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0

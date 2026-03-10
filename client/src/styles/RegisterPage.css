@@ -1,0 +1,90 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #353535;
+  font-family: "Open Sans", sans-serif;
+}
+
+.register-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.register-card {
+  position: relative;
+  width: 377px;
+  height: 500px;
+  background-color: #2b2b2b;
+  border-radius: 25px;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.register-title {
+  color: white;
+  font-weight: 700;
+  font-size: 36px;
+  margin: 0 0 60px 0;
+  user-select: none;
+}
+
+.register-input {
+  width: 326px;
+  height: 48px;
+  background-color: #323232;
+  border-radius: 5px;
+  border: 1px solid #ffffff;
+  color: white;
+  font-size: 22px;
+  padding: 8px 12px;
+  box-sizing: border-box;
+  outline: none;
+  font-weight: 300;
+  margin-bottom: 15px;
+}
+
+.register-button {
+  width: 326px;
+  height: 48px;
+  background-color: #272626;
+  border-radius: 15px;
+  border: none;
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
+}
+
+.register-button:hover {
+  background-color: #fbb564;
+}
+
+.register-footer {
+  margin-top: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  user-select: none;
+}
+
+.register-footer-text {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.register-footer-link {
+  color: #fa8f14;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  user-select: none;
+}

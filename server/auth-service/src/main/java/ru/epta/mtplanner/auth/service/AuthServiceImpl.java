@@ -1,0 +1,103 @@
+package ru.epta.mtplanner.auth.service;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+import ru.epta.mtplanner.auth.converter.AuthConverter;
+import ru.epta.mtplanner.auth.hash.PasswordEncoder;
+import ru.epta.mtplanner.auth.model.TokenPayload;
+import ru.epta.mtplanner.auth.model.request.Authorization;
+import ru.epta.mtplanner.auth.model.response.AuthResponse;
+import ru.epta.mtplanner.auth.utils.SessionUtils;
+import ru.epta.mtplanner.commons.converter.UserConverter;
+import ru.epta.mtplanner.commons.dao.UserDao;
+import ru.epta.mtplanner.commons.dao.dto.UserDto;
+import ru.epta.mtplanner.commons.exception.AlreadyExistsException;
+import ru.epta.mtplanner.commons.exception.IncorrectRequestDataException;
+import ru.epta.mtplanner.commons.exception.UnauthorizedException;
+import ru.epta.mtplanner.commons.model.User;
+
+import java.time.Instant;
+import java.util.Optional;
+
+@Primary
+@Service
+public class AuthServiceImpl implements AuthService {
+
+    @Value("${spring.mail.username}")
+    private String SOURCE_EMAIL;
+    private final UserDao userDao;
+    private final JavaMailSender mailSender;
+    private final SessionUtils sessionUtils;
+
+    public AuthServiceImpl(UserDao userDao, JavaMailSender mailSender, SessionUtils sessionUtils) {
+        this.userDao = userDao;
+        this.mailSender = mailSender;
+        this.sessionUtils = sessionUtils;
+    }
+
+    @Override
+    public AuthResponse login(Authorization request) {
+        String login = request.getLogin();
+        String password = request.getPassword();
+
+        UserDto userDto = userDao.findByUsernameOrEmail(login)
+            .orElseThrow(() -> new UnauthorizedException("User not found"));
+
+        if (!PasswordEncoder.matches(password, userDto.getPassword())) {
+            throw new UnauthorizedException("Invalid password");
+        }
+
+        User user = new User();
+        new UserConverter().fromDto(userDto, user);
+
+        String token = sessionUtils.createSession(userDto.getId());
+        return new AuthResponse(token, user);
+    }
+
+    @Override
+    public AuthResponse register(Authorization request) {
+        if (!request.validToRegistration()) {
+            throw new IncorrectRequestDataException("You should fill all fields!");
+        }
+        userDao.findByUsernameOrEmail(request.getLogin(), request.getEmail()).ifPresent((userDto) -> {
+            throw new AlreadyExistsException("User with this username or email exists");
+        });
+
+        request.setPassword(PasswordEncoder.encode(request.getPassword()));
+        UserDto newUser = new UserDto();
+        new AuthConverter().toDto(request, newUser);
+        newUser = userDao.save(newUser);
+
+        User user = new User();
+        new UserConverter().fromDto(newUser, user);
+
+        String sessionId = sessionUtils.createSession(newUser.getId());
+        return new AuthResponse(sessionId, user);
+    }
+
+    @Override
+    public TokenPayload validateSession(String sessionId) {
+        UnauthorizedException sessionHasBeenFinishedException = new UnauthorizedException("This session has been finished");
+
+        TokenPayload tokenPayload = Optional.of(sessionUtils.getSession(sessionId)).orElseThrow(()-> sessionHasBeenFinishedException);
+        if (tokenPayload.getExpires().isBefore(Instant.now())) {
+            sessionUtils.deleteSession(sessionId);
+            throw sessionHasBeenFinishedException;
+        }
+        return tokenPayload;
+    }
+
+    @Async
+    protected void sendCodeToMail(String receiver, String code) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(SOURCE_EMAIL);
+        message.setSubject("Активация аккаунта");
+        message.setTo(receiver);
+        message.setText("Код для активации учетной записи - %s".formatted(code));
+        mailSender.send(message);
+    }
+}

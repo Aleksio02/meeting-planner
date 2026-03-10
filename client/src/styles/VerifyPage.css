@@ -1,0 +1,141 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #353535;
+  font-family: "Open Sans", sans-serif;
+}
+
+
+.verify-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+
+.verify-card {
+  width: 100%;
+  max-width: 380px;
+  background-color: #2b2b2b;
+  border-radius: 25px;
+  padding: 30px 25px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+.verify-title {
+  color: white;
+  font-weight: 700;
+  font-size: 28px;
+  margin: 10px 0 10px 0;
+  text-align: center;
+}
+
+
+.verify-subtitle {
+  color: #ffffff;
+  font-weight: 300;
+  font-size: 14px;
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+
+.verify-email {
+  color: #fa8f14;
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 25px;
+  text-align: center;
+  word-break: break-all;
+}
+
+
+.verify-code-container {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 25px;
+  width: 100%;
+}
+
+
+.verify-code-input {
+  width: 55px;
+  height: 55px;
+  background-color: #323232;
+  border-radius: 10px;
+  border: 1px solid #ffffff;
+  color: white;
+  font-size: 24px;
+  text-align: center;
+  outline: none;
+  transition: 0.3s;
+  flex: 1;
+  max-width: 60px;
+}
+
+.verify-code-input:focus {
+  border-color: #fa8f14;
+  box-shadow: 0 0 6px #fa8f14;
+}
+
+
+.verify-button {
+  width: 100%;
+  height: 48px;
+  background-color: #272626;
+  border-radius: 15px;
+  border: none;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.verify-button:hover {
+  background-color: #fbb564;
+}
+
+
+.verify-footer {
+  margin-top: 25px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  text-align: center;
+}
+
+.verify-footer-text {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.verify-footer-link {
+  color: #fa8f14;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+
+@media (max-width: 400px) {
+  .verify-card {
+    padding: 25px 20px;
+  }
+
+  .verify-code-input {
+    height: 50px;
+    font-size: 20px;
+  }
+}

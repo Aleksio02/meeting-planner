@@ -1,7 +1,6 @@
 package ru.epta.mtplanner.auth.service;
 
 import java.time.Instant;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.mail.SimpleMailMessage;
@@ -10,7 +9,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ru.epta.mtplanner.auth.converter.AuthConverter;
 import ru.epta.mtplanner.auth.hash.PasswordEncoder;
-import ru.epta.mtplanner.auth.model.TokenPayload;
 import ru.epta.mtplanner.auth.model.request.Authorization;
 import ru.epta.mtplanner.auth.model.response.AuthResponse;
 import ru.epta.mtplanner.auth.utils.SessionUtils;
@@ -21,6 +19,7 @@ import ru.epta.mtplanner.commons.dao.dto.UserDto;
 import ru.epta.mtplanner.commons.exception.AlreadyExistsException;
 import ru.epta.mtplanner.commons.exception.IncorrectRequestDataException;
 import ru.epta.mtplanner.commons.exception.UnauthorizedException;
+import ru.epta.mtplanner.commons.model.TokenPayload;
 import ru.epta.mtplanner.commons.model.User;
 
 @Primary
@@ -85,14 +84,17 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public TokenPayload validateSession(String sessionId) {
-        UnauthorizedException sessionHasBeenFinishedException = new UnauthorizedException("This session has been finished");
-
-        TokenPayload tokenPayload = Optional.of(sessionUtils.getSession(sessionId)).orElseThrow(()-> sessionHasBeenFinishedException);
-        if (tokenPayload.getExpires().isBefore(Instant.now())) {
-            sessionUtils.deleteSession(sessionId);
+        RuntimeException sessionHasBeenFinishedException = new UnauthorizedException("This session has been finished");
+        try {
+            TokenPayload tokenPayload = sessionUtils.getSession(sessionId);
+            if (tokenPayload.getExpires().isBefore(Instant.now())) {
+                sessionUtils.deleteSession(sessionId);
+                throw sessionHasBeenFinishedException;
+            }
+            return sessionUtils.extendSession(sessionId);
+        } catch (Exception e) {
             throw sessionHasBeenFinishedException;
         }
-        return tokenPayload;
     }
 
     @Async

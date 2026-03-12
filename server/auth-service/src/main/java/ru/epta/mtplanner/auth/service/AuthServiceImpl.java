@@ -1,6 +1,7 @@
 package ru.epta.mtplanner.auth.service;
 
 import java.time.Instant;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.mail.SimpleMailMessage;
@@ -9,10 +10,12 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ru.epta.mtplanner.auth.converter.AuthConverter;
 import ru.epta.mtplanner.auth.hash.PasswordEncoder;
+import ru.epta.mtplanner.auth.model.TokenPayload;
 import ru.epta.mtplanner.auth.model.request.Authorization;
 import ru.epta.mtplanner.auth.model.response.AuthResponse;
 import ru.epta.mtplanner.auth.utils.SessionUtils;
 import ru.epta.mtplanner.commons.converter.UserConverter;
+import ru.epta.mtplanner.commons.dao.ProfileDao;
 import ru.epta.mtplanner.commons.dao.UserDao;
 import ru.epta.mtplanner.commons.dao.dto.UserDto;
 import ru.epta.mtplanner.commons.exception.AlreadyExistsException;
@@ -28,11 +31,13 @@ public class AuthServiceImpl implements AuthService {
     @Value("${spring.mail.username}")
     private String SOURCE_EMAIL;
     private final UserDao userDao;
+    private final ProfileDao profileDao;
     private final JavaMailSender mailSender;
     private final SessionUtils sessionUtils;
 
-    public AuthServiceImpl(UserDao userDao, JavaMailSender mailSender, SessionUtils sessionUtils) {
+    public AuthServiceImpl(UserDao userDao, ProfileDao profileDao, JavaMailSender mailSender, SessionUtils sessionUtils) {
         this.userDao = userDao;
+        this.profileDao = profileDao;
         this.mailSender = mailSender;
         this.sessionUtils = sessionUtils;
     }
@@ -70,6 +75,8 @@ public class AuthServiceImpl implements AuthService {
         new AuthConverter().toDto(request, newUser);
         newUser = userDao.save(newUser);
 
+        profileDao.insertProfile(newUser.getId());
+
         User user = new User();
         new UserConverter().fromDto(newUser, user);
 
@@ -90,6 +97,7 @@ public class AuthServiceImpl implements AuthService {
         } catch (Exception e) {
             throw sessionHasBeenFinishedException;
         }
+        return tokenPayload;
     }
 
     @Async

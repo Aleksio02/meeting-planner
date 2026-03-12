@@ -1,7 +1,6 @@
 package ru.epta.mtplanner.auth.service;
 
 import java.time.Instant;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.mail.SimpleMailMessage;
@@ -10,7 +9,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ru.epta.mtplanner.auth.converter.AuthConverter;
 import ru.epta.mtplanner.auth.hash.PasswordEncoder;
-import ru.epta.mtplanner.auth.model.TokenPayload;
 import ru.epta.mtplanner.auth.model.request.Authorization;
 import ru.epta.mtplanner.auth.model.response.AuthResponse;
 import ru.epta.mtplanner.auth.utils.SessionUtils;
@@ -97,7 +95,6 @@ public class AuthServiceImpl implements AuthService {
         } catch (Exception e) {
             throw sessionHasBeenFinishedException;
         }
-        return tokenPayload;
     }
 
     @Async

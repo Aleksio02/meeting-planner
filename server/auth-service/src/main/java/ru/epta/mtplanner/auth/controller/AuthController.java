@@ -1,16 +1,15 @@
 package ru.epta.mtplanner.auth.controller;
 
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import ru.epta.mtplanner.commons.model.TokenPayload;
+import org.springframework.web.bind.annotation.*;
 import ru.epta.mtplanner.auth.model.request.Authorization;
+import ru.epta.mtplanner.auth.model.request.GetListRequest;
 import ru.epta.mtplanner.auth.model.response.AuthResponse;
 import ru.epta.mtplanner.auth.service.AuthService;
+import ru.epta.mtplanner.commons.dao.dto.UserDto;
+import ru.epta.mtplanner.commons.model.TokenPayload;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -34,5 +33,10 @@ public class AuthController {
     @GetMapping("/validateSession")
     public TokenPayload validateSession(@CookieValue(name = "sessionId", required = false) String sessionId) {
         return authService.validateSession(sessionId);
+    }
+
+    @GetMapping("/users")
+    public List<UserDto> searchUsers(@Valid @RequestBody GetListRequest request) {
+        return authService.searchUsers(request.getSearchString());
     }
 }

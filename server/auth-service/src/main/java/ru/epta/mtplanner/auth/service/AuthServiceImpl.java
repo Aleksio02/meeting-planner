@@ -1,6 +1,5 @@
 package ru.epta.mtplanner.auth.service;
 
-import java.time.Instant;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.mail.SimpleMailMessage;
@@ -21,6 +20,9 @@ import ru.epta.mtplanner.commons.exception.IncorrectRequestDataException;
 import ru.epta.mtplanner.commons.exception.UnauthorizedException;
 import ru.epta.mtplanner.commons.model.TokenPayload;
 import ru.epta.mtplanner.commons.model.User;
+
+import java.time.Instant;
+import java.util.List;
 
 @Primary
 @Service
@@ -95,6 +97,14 @@ public class AuthServiceImpl implements AuthService {
         } catch (Exception e) {
             throw sessionHasBeenFinishedException;
         }
+    }
+
+    @Override
+    public List<UserDto> searchUsers(String searchString) {
+        if (searchString == null || searchString.trim().isEmpty()) {
+            return userDao.findAll();
+        }
+        return userDao.findBySearchString(searchString);
     }
 
     @Async

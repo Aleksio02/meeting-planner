@@ -1,5 +1,6 @@
 package ru.epta.mtplanner.commons.dao;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -21,11 +22,21 @@ public interface UserDao extends JpaRepository<UserDto, UUID>, JpaSpecificationE
         return findByUsernameOrEmail(login, login);
     }
 
-    @Query("SELECT u FROM UserDto u " +
-            "LEFT JOIN ProfileDto p ON u.id = p.id " +
-            "WHERE " +
-            "LOWER(u.email) LIKE LOWER(CONCAT('%', :searchString, '%')) OR " +
-            "LOWER(p.firstName) LIKE LOWER(CONCAT('%', :searchString, '%')) OR " +
-            "LOWER(p.lastName) LIKE LOWER(CONCAT('%', :searchString, '%'))")
-    List<UserDto> findBySearchString(@Param("searchString") String searchString);
+    @Query("""
+           SELECT u FROM UserDto u 
+           WHERE (:searchString IS NULL OR :searchString = '' 
+                  OR LOWER(u.username) LIKE LOWER(CONCAT('%', :searchString, '%')) 
+                  OR LOWER(u.email) LIKE LOWER(CONCAT('%', :searchString, '%')))
+           ORDER BY u.username
+           """)
+    List<UserDto> searchUsers(
+            @Param("searchString") String searchString,
+            Pageable pageable
+    );
+
+    @Query("""
+           SELECT u FROM UserDto u 
+           ORDER BY u.username
+           """)
+    List<UserDto> findAllUsers(Pageable pageable);
 }

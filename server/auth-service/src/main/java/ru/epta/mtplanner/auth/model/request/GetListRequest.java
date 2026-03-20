@@ -7,4 +7,6 @@ import lombok.Setter;
 @Setter
 public class GetListRequest {
     private String searchString;
+    private Integer page;
+    private Integer pageSize;
 }

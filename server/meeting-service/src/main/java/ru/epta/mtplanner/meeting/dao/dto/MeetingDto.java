@@ -31,6 +31,7 @@ public class MeetingDto extends AbstractEntityDto {
     @Column
     private int duration;
 
+    @Enumerated(EnumType.STRING)
     @Column
     private MeetingStatus status;
 }

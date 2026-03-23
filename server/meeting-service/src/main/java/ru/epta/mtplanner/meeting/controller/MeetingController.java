@@ -4,10 +4,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Nullable;
 import java.util.List;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import java.util.UUID;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import ru.epta.mtplanner.meeting.config.annotation.RequiresAuth;
 import ru.epta.mtplanner.meeting.model.Meeting;
 import ru.epta.mtplanner.meeting.model.request.GetListMeetingRequest;
@@ -30,5 +30,13 @@ public class MeetingController {
     @GetMapping
     public List<Meeting> getListMeetingRequest(@Nullable @ModelAttribute GetListMeetingRequest request) {
         return meetingService.getListMeeting(request);
+    }
+
+    @Operation(summary = "Удалить событие",
+            description = "Удаляет событие по ID")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteMeeting(@PathVariable UUID id) {
+        meetingService.deleteMeeting(id);
+        return ResponseEntity.noContent().build();
     }
 }

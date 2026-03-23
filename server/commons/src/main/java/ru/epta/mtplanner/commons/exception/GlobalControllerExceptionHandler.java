@@ -55,6 +55,20 @@ public class GlobalControllerExceptionHandler {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, errorMessage);
     }
 
+    @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(org.springframework.dao.DataIntegrityViolationException exception, WebRequest request) {
+        String message = "Cannot delete meeting because it has associated invites";
+
+        // Проверяем, что это именно foreign key constraint
+        if (exception.getMessage().contains("foreign key constraint") ||
+                exception.getMessage().contains("invites_meeting_id_fkey")) {
+            return buildErrorResponse(HttpStatus.CONFLICT, message);
+        }
+
+        // Для других нарушений целостности
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Data integrity violation");
+    }
+
     private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message) {
         ErrorResponse response = ErrorResponse.builder()
                 .errorCode(status.value())

@@ -2,12 +2,15 @@ package ru.epta.mtplanner.meeting.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import ru.epta.mtplanner.commons.exception.NotFoundException;
 import ru.epta.mtplanner.meeting.converter.MeetingConverter;
 import ru.epta.mtplanner.meeting.dao.MeetingDao;
 import ru.epta.mtplanner.meeting.dao.dto.MeetingDto;
@@ -44,5 +47,13 @@ public class MeetingServiceImpl implements MeetingService {
         }
 
         return meetings;
+    }
+
+    @Override
+    public void deleteMeeting(UUID id) {
+        if (!meetingDao.existsById(id)) {
+            throw new NotFoundException("Meeting not found with id " + id);
+        }
+        meetingDao.deleteById(id);
     }
 }

@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.context.annotation.Primary;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ru.epta.mtplanner.commons.exception.NotFoundException;
 import ru.epta.mtplanner.meeting.converter.MeetingConverter;
 import ru.epta.mtplanner.meeting.dao.MeetingDao;
 import ru.epta.mtplanner.meeting.dao.dto.MeetingDto;
@@ -50,9 +50,9 @@ public class MeetingServiceImpl implements MeetingService {
     }
 
     @Override
-    public void deleteMeeting(UUID id) {
+    public void deleteMeeting(UUID id, UUID currentUserId) {
         if (!meetingDao.existsById(id)) {
-            throw new NotFoundException("Meeting not found with id " + id);
+            throw new EntityNotFoundException("Meeting not found with id: " + id);
         }
         meetingDao.deleteById(id);
     }

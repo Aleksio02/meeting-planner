@@ -35,8 +35,8 @@ public class MeetingController {
     @Operation(summary = "Удалить событие",
             description = "Удаляет событие по ID")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMeeting(@PathVariable UUID id) {
-        meetingService.deleteMeeting(id);
-        return ResponseEntity.noContent().build();
+    public void deleteMeeting(@PathVariable UUID id,
+                              @CurrentUser UUID currentUserId) {
+        meetingService.deleteMeeting(id, currentUserId);
     }
 }

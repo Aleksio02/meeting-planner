@@ -8,6 +8,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.UUID;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import ru.epta.mtplanner.meeting.config.annotation.RequiresAuth;
 import ru.epta.mtplanner.meeting.model.Meeting;
 import ru.epta.mtplanner.meeting.model.request.GetListMeetingRequest;
 import ru.epta.mtplanner.meeting.service.MeetingService;
@@ -29,5 +34,13 @@ public class MeetingController {
     @GetMapping
     public List<Meeting> getListMeetingRequest(@Nullable @ModelAttribute GetListMeetingRequest request) {
         return meetingService.getListMeeting(request);
+    }
+
+    @Operation(summary = "Удалить событие",
+            description = "Удаляет событие по ID")
+    @DeleteMapping("/{id}")
+    public void deleteMeeting(@PathVariable UUID id,
+                              @CurrentUser UUID currentUserId) {
+        meetingService.deleteMeeting(id, currentUserId);
     }
 }

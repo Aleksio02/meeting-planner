@@ -13,4 +13,5 @@ public interface MeetingService {
 
     List<Meeting> getListMeeting(GetListMeetingRequest request);
     Meeting createMeeting(CreateMeetingRequest request, UUID currentId);
+    void deleteMeeting(UUID id);
 }

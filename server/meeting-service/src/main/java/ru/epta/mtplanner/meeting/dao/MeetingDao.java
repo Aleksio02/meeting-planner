@@ -11,4 +11,5 @@ import java.util.UUID;
 @Repository
 public interface MeetingDao extends JpaRepository<MeetingDto, UUID>, JpaSpecificationExecutor<MeetingDto> {
     Optional<MeetingDto> findByTitle(String title);
+    void deleteById(UUID id);
 }

@@ -1,5 +1,6 @@
 package ru.epta.mtplanner.meeting.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -78,5 +79,14 @@ public class MeetingServiceImpl implements MeetingService {
         MeetingConverter meetingConverter = new MeetingConverter();
         meetingConverter.fromDto(savedMeeting, meeting);
         return meeting;
+    }
+
+    @Override
+    @Transactional
+    public void deleteMeeting(UUID id, UUID currentUserId) {
+        if (!meetingDao.existsById(id)) {
+            throw new EntityNotFoundException("Meeting not found with id: " + id);
+        }
+        meetingDao.deleteById(id);
     }
 }

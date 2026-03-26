@@ -37,4 +37,12 @@ public class MeetingController {
     public Meeting createMeeting(@Valid @RequestBody CreateMeetingRequest request, @CurrentUser UUID currentId) {
         return meetingService.createMeeting(request, currentId);
     }
+
+    @Operation(summary = "Удалить событие",
+            description = "Удаляет событие по ID")
+    @DeleteMapping("/{id}")
+    public void deleteMeeting(@PathVariable UUID id,
+                              @CurrentUser UUID currentUserId) {
+        meetingService.deleteMeeting(id, currentUserId);
+    }
 }

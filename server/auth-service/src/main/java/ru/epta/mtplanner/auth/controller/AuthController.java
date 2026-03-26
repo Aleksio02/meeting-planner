@@ -16,7 +16,7 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @GetMapping("/login")
+    @PostMapping("/login")
     public AuthResponse login(@Valid @RequestBody Authorization request) {
         return authService.login(request);
     }

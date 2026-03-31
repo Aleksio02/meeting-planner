@@ -1,7 +1,7 @@
 services:
   postgres:
     container_name: mtp_db
-    image: postgres
+    image: postgres:17-alpine
     environment:
       POSTGRES_DB: mt_planner
       POSTGRES_USER: mtp_admin

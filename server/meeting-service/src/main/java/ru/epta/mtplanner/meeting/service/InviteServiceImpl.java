@@ -48,21 +48,6 @@ public class InviteServiceImpl implements InviteService {
 
     @Override
     @Transactional
-    public void deleteInvite(UUID id, UUID currentUserId) {
-        InviteDto inviteDto = inviteDao.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Invite not found with id: " + id));
-
-        UUID ownerId = inviteDto.getMeeting().getOwnerId().getId();
-
-        if (!currentUserId.equals(ownerId)) {
-            throw new AccessForbiddenException("You are not the owner of the meeting. Only the meeting owner can delete invites.");
-        }
-
-        inviteDao.deleteById(id);
-    }
-
-    @Override
-    @Transactional
     public Invite createInvite(CreateInviteRequest request, UUID currentId) {
         MeetingDto meetingDto = meetingDao.findById(request.getMeetingId())
                 .orElseThrow(() -> new EntityNotFoundException("Meeting not found with id: " + request.getMeetingId()));
@@ -91,5 +76,20 @@ public class InviteServiceImpl implements InviteService {
         inviteConverter.fromDto(savedInvite, invite);
 
         return invite;
+    }
+
+    @Override
+    @Transactional
+    public void deleteInvite(UUID id, UUID currentUserId) {
+        InviteDto inviteDto = inviteDao.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Invite not found with id: " + id));
+
+        UUID ownerId = inviteDto.getMeeting().getOwnerId().getId();
+
+        if (!currentUserId.equals(ownerId)) {
+            throw new AccessForbiddenException("You are not the owner of the meeting. Only the meeting owner can delete invites.");
+        }
+
+        inviteDao.deleteById(id);
     }
 }

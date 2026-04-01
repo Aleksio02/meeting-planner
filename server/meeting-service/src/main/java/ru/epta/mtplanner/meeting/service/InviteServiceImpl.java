@@ -23,9 +23,9 @@ import ru.epta.mtplanner.meeting.model.request.CreateInviteRequest;
 import ru.epta.mtplanner.meeting.model.request.GetListInviteRequest;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Primary
 @Service
@@ -67,15 +67,15 @@ public class InviteServiceImpl implements InviteService {
         );
 
         Page<InviteDto> foundInvites = inviteDao.findAll(InviteSpecification.build(request), pageable);
-        List<Invite> invites = new ArrayList<>(foundInvites.getSize());
         InviteConverter inviteConverter = new InviteConverter();
-        for (var inviteDto : foundInvites) {
-            Invite invite = new Invite();
-            inviteConverter.fromDto(inviteDto, invite);
-            invites.add(invite);
-        }
 
-        return invites;
+        return foundInvites.stream()
+                .map(inviteDto -> {
+                    Invite invite = new Invite();
+                    inviteConverter.fromDto(inviteDto, invite);
+                    return invite;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override

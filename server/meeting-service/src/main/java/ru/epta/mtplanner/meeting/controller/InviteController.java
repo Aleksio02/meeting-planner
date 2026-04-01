@@ -30,7 +30,7 @@ public class InviteController {
     }
 
     @GetMapping
-    public List<Invite> getListMeetingRequest(@Nullable @ModelAttribute GetListInviteRequest request) {
+    public List<Invite> getListInviteRequest(@Nullable @ModelAttribute GetListInviteRequest request) {
         return inviteService.getListInviteRequest(request);
     }
 

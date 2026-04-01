@@ -8,5 +8,6 @@ import java.util.UUID;
 
 @Service
 public interface InviteService {
+    Invite getInviteById(UUID id);
     Invite createInvite(CreateInviteRequest request, UUID currentId);
 }

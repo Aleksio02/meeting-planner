@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.epta.mtplanner.commons.dao.UserDao;
 import ru.epta.mtplanner.commons.dao.dto.UserDto;
+import ru.epta.mtplanner.commons.exception.AccessForbiddenException;
 import ru.epta.mtplanner.meeting.converter.MeetingConverter;
 import ru.epta.mtplanner.meeting.dao.MeetingDao;
 import ru.epta.mtplanner.meeting.dao.dto.MeetingDto;
@@ -17,6 +18,7 @@ import ru.epta.mtplanner.meeting.dao.specification.MeetingSpecification;
 import ru.epta.mtplanner.meeting.model.Meeting;
 import ru.epta.mtplanner.meeting.model.request.CreateMeetingRequest;
 import ru.epta.mtplanner.meeting.model.request.GetListMeetingRequest;
+import ru.epta.mtplanner.meeting.model.request.UpdateMeetingRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,4 +103,46 @@ public class MeetingServiceImpl implements MeetingService {
         }
         meetingDao.deleteById(id);
     }
+
+    @Override
+    @Transactional
+    public Meeting updateMeeting(UUID id, UpdateMeetingRequest request, UUID currentUserId) {
+        MeetingDto meetingDto = meetingDao.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Meeting not found with id: " + id));
+
+        UUID ownerId = meetingDto.getOwnerId().getId();
+
+        if (!currentUserId.equals(ownerId)) {
+            throw new AccessForbiddenException("You are not the owner of the meeting. Only the meeting owner can update it.");
+        }
+
+        if (request.getTitle().isPresent()) {
+            meetingDto.setTitle(request.getTitle().get());
+        }
+
+        if (request.getDescription().isPresent()) {
+            meetingDto.setDescription(request.getDescription().get());
+        }
+
+        if (request.getStartsAt().isPresent()) {
+            meetingDto.setStartsAt(request.getStartsAt().get());
+        }
+
+        if (request.getDuration().isPresent()) {
+            meetingDto.setDuration(request.getDuration().get());
+        }
+
+        if (request.getStatus().isPresent()) {
+            meetingDto.setStatus(request.getStatus().get());
+        }
+
+        MeetingDto savedMeeting = meetingDao.save(meetingDto);
+
+        Meeting meeting = new Meeting();
+        MeetingConverter meetingConverter = new MeetingConverter();
+        meetingConverter.fromDto(savedMeeting, meeting);
+
+        return meeting;
+    }
+
 }

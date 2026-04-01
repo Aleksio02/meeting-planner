@@ -9,6 +9,7 @@ import ru.epta.mtplanner.meeting.config.annotation.CurrentUser;
 import ru.epta.mtplanner.meeting.model.Meeting;
 import ru.epta.mtplanner.meeting.model.request.CreateMeetingRequest;
 import ru.epta.mtplanner.meeting.model.request.GetListMeetingRequest;
+import ru.epta.mtplanner.meeting.model.request.UpdateMeetingRequest;
 import ru.epta.mtplanner.meeting.service.MeetingService;
 
 import java.util.List;
@@ -51,5 +52,12 @@ public class MeetingController {
     public void deleteMeeting(@PathVariable UUID id,
                               @CurrentUser UUID currentUserId) {
         meetingService.deleteMeeting(id, currentUserId);
+    }
+
+    @PatchMapping("/{id}")
+    public Meeting updateMeeting(@PathVariable UUID id,
+                                 @Valid @RequestBody UpdateMeetingRequest request,
+                                 @CurrentUser UUID currentUserId) {
+        return meetingService.updateMeeting(id, request, currentUserId);
     }
 }

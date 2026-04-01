@@ -20,14 +20,21 @@ import java.util.UUID;
 public class MeetingController {
     private final MeetingService meetingService;
 
-    public MeetingController(MeetingService meetingService) {this.meetingService = meetingService;}
+    public MeetingController(MeetingService meetingService) {
+        this.meetingService = meetingService;
+    }
+
+    @GetMapping("/{id}")
+    public Meeting getMeeting(@PathVariable UUID id) {
+        return meetingService.getMeetingById(id);
+    }
 
     @Operation(summary = "Получить список событий",
-        description = """
-        Получить список событий по фильтрам.\n
-        Примечания:\n
-        Параметры limit, offset, sortBy и sortDirection имеют стандартные значения, поэтому их можно не указывать!
-        """)
+            description = """
+                    Получить список событий по фильтрам.\n
+                    Примечания:\n
+                    Параметры limit, offset, sortBy и sortDirection имеют стандартные значения, поэтому их можно не указывать!
+                    """)
     @GetMapping
     public List<Meeting> getListMeetingRequest(@Nullable @ModelAttribute GetListMeetingRequest request) {
         return meetingService.getListMeeting(request);

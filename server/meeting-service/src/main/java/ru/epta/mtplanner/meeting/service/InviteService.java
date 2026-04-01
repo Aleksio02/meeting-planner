@@ -10,4 +10,5 @@ import java.util.UUID;
 public interface InviteService {
     Invite getInviteById(UUID id);
     Invite createInvite(CreateInviteRequest request, UUID currentId);
+    void deleteInvite(UUID id, UUID currentUserId);
 }

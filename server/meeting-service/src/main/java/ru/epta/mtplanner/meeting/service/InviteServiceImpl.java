@@ -2,6 +2,10 @@ package ru.epta.mtplanner.meeting.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.epta.mtplanner.commons.dao.UserDao;
@@ -13,11 +17,15 @@ import ru.epta.mtplanner.meeting.dao.InviteDao;
 import ru.epta.mtplanner.meeting.dao.MeetingDao;
 import ru.epta.mtplanner.meeting.dao.dto.InviteDto;
 import ru.epta.mtplanner.meeting.dao.dto.MeetingDto;
+import ru.epta.mtplanner.meeting.dao.specification.InviteSpecification;
 import ru.epta.mtplanner.meeting.model.Invite;
 import ru.epta.mtplanner.meeting.model.request.CreateInviteRequest;
+import ru.epta.mtplanner.meeting.model.request.GetListInviteRequest;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Primary
 @Service
@@ -44,6 +52,30 @@ public class InviteServiceImpl implements InviteService {
         inviteConverter.fromDto(inviteDto, invite);
 
         return invite;
+    }
+
+    @Override
+    public List<Invite> getListInviteRequest(GetListInviteRequest request) {
+        if (request == null) {
+            request = new GetListInviteRequest();
+        }
+
+        Pageable pageable = PageRequest.of(
+                request.getPage(),
+                request.getPageSize(),
+                Sort.by(Sort.Direction.fromString(request.getSortDirection()), request.getSortBy())
+        );
+
+        Page<InviteDto> foundInvites = inviteDao.findAll(InviteSpecification.build(request), pageable);
+        InviteConverter inviteConverter = new InviteConverter();
+
+        return foundInvites.stream()
+                .map(inviteDto -> {
+                    Invite invite = new Invite();
+                    inviteConverter.fromDto(inviteDto, invite);
+                    return invite;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override

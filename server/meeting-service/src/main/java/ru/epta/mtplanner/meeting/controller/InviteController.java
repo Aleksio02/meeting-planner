@@ -2,17 +2,16 @@ package ru.epta.mtplanner.meeting.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import ru.epta.mtplanner.meeting.config.annotation.CurrentUser;
 import ru.epta.mtplanner.meeting.model.Invite;
 import ru.epta.mtplanner.meeting.model.request.CreateInviteRequest;
+import ru.epta.mtplanner.meeting.model.request.GetListInviteRequest;
 import ru.epta.mtplanner.meeting.service.InviteService;
 
+import java.util.List;
 import java.util.UUID;
 
 @Tag(name = "Приглашения")
@@ -21,12 +20,18 @@ import java.util.UUID;
 public class InviteController {
     private final InviteService inviteService;
 
-    public InviteController(InviteService inviteService) {this.inviteService = inviteService;}
-
+    public InviteController(InviteService inviteService) {
+        this.inviteService = inviteService;
+    }
 
     @GetMapping("/{id}")
     public Invite getInvite(@PathVariable UUID id) {
         return inviteService.getInviteById(id);
+    }
+
+    @GetMapping
+    public List<Invite> getListInviteRequest(@Nullable @ModelAttribute GetListInviteRequest request) {
+        return inviteService.getListInviteRequest(request);
     }
 
     @PostMapping
@@ -42,4 +47,3 @@ public class InviteController {
         inviteService.deleteInvite(id, currentUserId);
     }
 }
-

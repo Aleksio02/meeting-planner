@@ -34,6 +34,18 @@ public class InviteServiceImpl implements InviteService {
     }
 
     @Override
+    public Invite getInviteById(UUID id) {
+        InviteDto inviteDto = inviteDao.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Invite not found with id: " + id));
+
+        Invite invite = new Invite();
+        InviteConverter inviteConverter = new InviteConverter();
+        inviteConverter.fromDto(inviteDto, invite);
+
+        return invite;
+    }
+
+    @Override
     @Transactional
     public Invite createInvite(CreateInviteRequest request, UUID currentId) {
         MeetingDto meetingDto = meetingDao.findById(request.getMeetingId())

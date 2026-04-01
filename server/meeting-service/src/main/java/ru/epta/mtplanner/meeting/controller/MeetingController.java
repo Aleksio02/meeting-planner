@@ -52,4 +52,5 @@ public class MeetingController {
                               @CurrentUser UUID currentUserId) {
         meetingService.deleteMeeting(id, currentUserId);
     }
+
 }

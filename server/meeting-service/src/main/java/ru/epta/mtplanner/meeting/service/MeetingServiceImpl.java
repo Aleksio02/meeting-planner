@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.epta.mtplanner.commons.dao.UserDao;
 import ru.epta.mtplanner.commons.dao.dto.UserDto;
+import ru.epta.mtplanner.commons.exception.AccessForbiddenException;
 import ru.epta.mtplanner.meeting.converter.MeetingConverter;
 import ru.epta.mtplanner.meeting.dao.MeetingDao;
 import ru.epta.mtplanner.meeting.dao.dto.MeetingDto;
@@ -96,9 +97,15 @@ public class MeetingServiceImpl implements MeetingService {
     @Override
     @Transactional
     public void deleteMeeting(UUID id, UUID currentUserId) {
-        if (!meetingDao.existsById(id)) {
-            throw new EntityNotFoundException("Meeting not found with id: " + id);
+        MeetingDto meetingDto = meetingDao.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Meeting not found with id: " + id));
+
+        UUID ownerID = meetingDto.getOwnerId().getId();
+
+        if (!currentUserId.equals(ownerID)) {
+            throw new AccessForbiddenException("You are not the owner of this meeting. Only the meeting owner can delete meetings.");
         }
+
         meetingDao.deleteById(id);
     }
 }

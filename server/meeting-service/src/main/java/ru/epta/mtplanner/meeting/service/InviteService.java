@@ -15,4 +15,5 @@ public interface InviteService {
     List<Invite> getListInviteRequest(GetListInviteRequest request);
 
     Invite createInvite(CreateInviteRequest request, UUID currentId);
+    void deleteInvite(UUID id, UUID currentUserId);
 }

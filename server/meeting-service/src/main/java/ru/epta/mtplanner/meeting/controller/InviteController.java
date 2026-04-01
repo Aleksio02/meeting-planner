@@ -6,10 +6,8 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import ru.epta.mtplanner.meeting.config.annotation.CurrentUser;
 import ru.epta.mtplanner.meeting.model.Invite;
-import ru.epta.mtplanner.meeting.model.Meeting;
 import ru.epta.mtplanner.meeting.model.request.CreateInviteRequest;
 import ru.epta.mtplanner.meeting.model.request.GetListInviteRequest;
-import ru.epta.mtplanner.meeting.model.request.GetListMeetingRequest;
 import ru.epta.mtplanner.meeting.service.InviteService;
 
 import java.util.List;
@@ -32,7 +30,7 @@ public class InviteController {
 
     @GetMapping
     public List<Invite> getListMeetingRequest(@Nullable @ModelAttribute GetListInviteRequest request) {
-        return null;
+        return inviteService.getListInviteRequest(request);
     }
 
     @PostMapping

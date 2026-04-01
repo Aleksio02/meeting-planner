@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.epta.mtplanner.commons.dao.UserDao;
 import ru.epta.mtplanner.commons.dao.dto.UserDto;
 import ru.epta.mtplanner.commons.exception.AccessForbiddenException;
+import ru.epta.mtplanner.commons.exception.IncorrectRequestDataException;
 import ru.epta.mtplanner.meeting.converter.InviteConverter;
 import ru.epta.mtplanner.meeting.dao.InviteDao;
 import ru.epta.mtplanner.meeting.dao.MeetingDao;
@@ -15,6 +16,7 @@ import ru.epta.mtplanner.meeting.dao.dto.MeetingDto;
 import ru.epta.mtplanner.meeting.model.Invite;
 import ru.epta.mtplanner.meeting.model.request.CreateInviteRequest;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Primary
@@ -44,11 +46,15 @@ public class InviteServiceImpl implements InviteService {
         UserDto userDto = userDao.findById(request.getUserId())
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + request.getUserId()));
 
+        if (userDto.getId().equals(currentId)) {
+            throw new IncorrectRequestDataException("You are owner of this meeting.");
+        }
+
         InviteDto inviteDto = new InviteDto();
         inviteDto.setMeeting(meetingDto);
         inviteDto.setUser(userDto);
         inviteDto.setStatus(request.getStatus());
-        inviteDto.setSentAt(request.getSentAt());
+        inviteDto.setSentAt(LocalDateTime.now());
 
         InviteDto savedInvite = inviteDao.save(inviteDto);
 

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.epta.mtplanner.commons.dao.UserDao;
 import ru.epta.mtplanner.commons.dao.dto.UserDto;
+import ru.epta.mtplanner.commons.exception.AccessForbiddenException;
 import ru.epta.mtplanner.meeting.converter.InviteConverter;
 import ru.epta.mtplanner.meeting.dao.InviteDao;
 import ru.epta.mtplanner.meeting.dao.MeetingDao;
@@ -13,6 +14,8 @@ import ru.epta.mtplanner.meeting.dao.dto.InviteDto;
 import ru.epta.mtplanner.meeting.dao.dto.MeetingDto;
 import ru.epta.mtplanner.meeting.model.Invite;
 import ru.epta.mtplanner.meeting.model.request.CreateInviteRequest;
+
+import java.util.UUID;
 
 @Primary
 @Service
@@ -30,9 +33,13 @@ public class InviteServiceImpl implements InviteService {
 
     @Override
     @Transactional
-    public Invite createInvite(CreateInviteRequest request) {
+    public Invite createInvite(CreateInviteRequest request, UUID currentId) {
         MeetingDto meetingDto = meetingDao.findById(request.getMeetingId())
                 .orElseThrow(() -> new EntityNotFoundException("Meeting not found with id: " + request.getMeetingId()));
+
+        if (!meetingDto.getOwnerId().getId().equals(currentId)) {
+            throw new AccessForbiddenException("You are not the owner of this meeting. Only the meeting owner can create invites.");
+        }
 
         UserDto userDto = userDao.findById(request.getUserId())
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + request.getUserId()));

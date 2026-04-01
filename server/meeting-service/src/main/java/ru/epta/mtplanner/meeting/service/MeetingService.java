@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import ru.epta.mtplanner.meeting.model.Meeting;
 import ru.epta.mtplanner.meeting.model.request.CreateMeetingRequest;
 import ru.epta.mtplanner.meeting.model.request.GetListMeetingRequest;
+import ru.epta.mtplanner.meeting.model.request.UpdateMeetingRequest;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,4 +18,7 @@ public interface MeetingService {
     Meeting createMeeting(CreateMeetingRequest request, UUID currentId);
 
     void deleteMeeting(UUID id, UUID currentUserId);
+
+    Meeting updateMeeting(UUID id, UpdateMeetingRequest request, UUID currentUserId);
+
 }

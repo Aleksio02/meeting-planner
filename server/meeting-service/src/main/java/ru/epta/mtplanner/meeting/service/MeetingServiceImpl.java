@@ -116,25 +116,11 @@ public class MeetingServiceImpl implements MeetingService {
             throw new AccessForbiddenException("You are not the owner of the meeting. Only the meeting owner can update it.");
         }
 
-        if (request.getTitle().isPresent()) {
-            meetingDto.setTitle(request.getTitle().get());
-        }
-
-        if (request.getDescription().isPresent()) {
-            meetingDto.setDescription(request.getDescription().get());
-        }
-
-        if (request.getStartsAt().isPresent()) {
-            meetingDto.setStartsAt(request.getStartsAt().get());
-        }
-
-        if (request.getDuration().isPresent()) {
-            meetingDto.setDuration(request.getDuration().get());
-        }
-
-        if (request.getStatus().isPresent()) {
-            meetingDto.setStatus(request.getStatus().get());
-        }
+        request.getTitle().ifPresent(title -> meetingDto.setTitle(title));
+        request.getDescription().ifPresent(description -> meetingDto.setDescription(description));
+        request.getStartsAt().ifPresent(startsAt -> meetingDto.setStartsAt(startsAt));
+        request.getDuration().ifPresent(duration -> meetingDto.setDuration(duration));
+        request.getStatus().ifPresent(status -> meetingDto.setStatus(status));
 
         MeetingDto savedMeeting = meetingDao.save(meetingDto);
 

@@ -1,0 +1,64 @@
+name: Check project stability and running tests before merging to master
+run-name: Build project and run tests
+on:
+  pull_request:
+    branches:
+      - 'release_*'
+jobs:
+  build_server:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'oracle'
+          java-version: '21'
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Build server side
+        run: cd ./server && mvn clean package -Dmaven.test.skip=true
+  build_client:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [ 24.x ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - run: npm run build --if-present
+#      - run: npm test
+
+# TODO: To be in future
+#  unit_testing:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/setup-java@v4
+#        with:
+#          distribution: 'oracle'
+#          java-version: '21'
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#      - name: Run unit tests on authorization module
+#        run: cd ./server && mvn -pl auth -am clean test -P unit
+#      - name: Run unit tests on admin module
+#        run: cd ./server && mvn -pl admin -am clean test -P unit
+#      - name: Run unit tests on timetable manager module
+#        run: cd ./server && mvn -pl tt-manager -am clean test -P unit
+#  integration_testing:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/setup-java@v4
+#        with:
+#          distribution: 'oracle'
+#          java-version: '21'
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#      - name: Run integration tests on authorization module
+#        run: cd ./server && mvn -pl auth -am clean test -P integration
+#      - name: Run integration tests on admin module
+#        run: cd ./server && mvn -pl admin -am clean test -P integration
+#      - name: Run integration tests on timetable manager module
+#        run: cd ./server && mvn -pl tt-manager -am clean test -P integration

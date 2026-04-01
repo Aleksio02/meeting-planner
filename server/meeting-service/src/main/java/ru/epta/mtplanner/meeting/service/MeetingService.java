@@ -10,8 +10,11 @@ import java.util.UUID;
 
 @Service
 public interface MeetingService {
-
     List<Meeting> getListMeeting(GetListMeetingRequest request);
+
+    Meeting getMeetingById(UUID id);
+
     Meeting createMeeting(CreateMeetingRequest request, UUID currentId);
+
     void deleteMeeting(UUID id, UUID currentUserId);
 }

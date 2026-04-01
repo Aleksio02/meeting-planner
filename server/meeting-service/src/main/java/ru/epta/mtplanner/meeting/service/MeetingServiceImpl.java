@@ -35,21 +35,33 @@ public class MeetingServiceImpl implements MeetingService {
     }
 
     @Override
+    public Meeting getMeetingById(UUID id) {
+        MeetingDto meetingDto = meetingDao.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Meeting not found with id: " + id));
+
+        Meeting meeting = new Meeting();
+        MeetingConverter meetingConverter = new MeetingConverter();
+        meetingConverter.fromDto(meetingDto, meeting);
+
+        return meeting;
+    }
+
+    @Override
     public List<Meeting> getListMeeting(GetListMeetingRequest request) {
         if (request == null) {
             request = new GetListMeetingRequest();
         }
         Pageable pageable = PageRequest.of(
-            request.getOffset() / request.getLimit(),
-            request.getLimit(),
-            Sort.by(Sort.Direction.fromString(request.getSortDirection()), request.getSortBy())
+                request.getOffset() / request.getLimit(),
+                request.getLimit(),
+                Sort.by(Sort.Direction.fromString(request.getSortDirection()), request.getSortBy())
         );
 
 
         Page<MeetingDto> foundMeetings = meetingDao.findAll(MeetingSpecification.build(request), pageable);
         List<Meeting> meetings = new ArrayList<>(foundMeetings.getSize());
         MeetingConverter meetingConverter = new MeetingConverter();
-        for (var meetingDto: foundMeetings) {
+        for (var meetingDto : foundMeetings) {
             Meeting meeting = new Meeting();
             meetingConverter.fromDto(meetingDto, meeting);
             meetings.add(meeting);
@@ -60,7 +72,7 @@ public class MeetingServiceImpl implements MeetingService {
 
     @Override
     @Transactional
-    public Meeting createMeeting(CreateMeetingRequest request, UUID currentId){
+    public Meeting createMeeting(CreateMeetingRequest request, UUID currentId) {
 
         MeetingDto meetingDto = new MeetingDto();
         meetingDto.setTitle(request.getTitle());
@@ -70,7 +82,7 @@ public class MeetingServiceImpl implements MeetingService {
         meetingDto.setStatus(request.getStatus());
 
         UserDto owner = userDao.findById(currentId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + currentId));
+                .orElseThrow(() -> new EntityNotFoundException("User not found: " + currentId));
         meetingDto.setOwnerId(owner);
 
         MeetingDto savedMeeting = meetingDao.save(meetingDto);

@@ -7,11 +7,9 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import ru.epta.mtplanner.meeting.config.annotation.CurrentUser;
 import ru.epta.mtplanner.meeting.model.Invite;
-import ru.epta.mtplanner.meeting.model.Meeting;
+import ru.epta.mtplanner.meeting.model.enums.InviteStatus;
 import ru.epta.mtplanner.meeting.model.request.CreateInviteRequest;
 import ru.epta.mtplanner.meeting.model.request.GetListInviteRequest;
-import ru.epta.mtplanner.meeting.model.request.UpdateInviteRequest;
-import ru.epta.mtplanner.meeting.model.request.UpdateMeetingRequest;
 import ru.epta.mtplanner.meeting.service.InviteService;
 
 import java.util.List;
@@ -50,10 +48,15 @@ public class InviteController {
         inviteService.deleteInvite(id, currentUserId);
     }
 
-    @PatchMapping("/{id}")
-    public Invite updateInvite(@PathVariable UUID id,
-                                 @Valid @RequestBody UpdateInviteRequest request,
-                                 @CurrentUser UUID currentUserId) {
-        return inviteService.updateInvite(id, request, currentUserId);
+    @PostMapping("/{id}/accept")
+    public Invite acceptInvite(@PathVariable UUID id,
+                               @CurrentUser UUID currentUserId) {
+        return inviteService.updateInvite(id, InviteStatus.ACCEPTED, currentUserId);
+    }
+
+    @PostMapping("/{id}/decline")
+    public Invite declineInvite(@PathVariable UUID id,
+                               @CurrentUser UUID currentUserId) {
+        return inviteService.updateInvite(id, InviteStatus.DECLINED, currentUserId);
     }
 }

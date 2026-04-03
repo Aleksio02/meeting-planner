@@ -48,13 +48,13 @@ public class InviteController {
         inviteService.deleteInvite(id, currentUserId);
     }
 
-    @PostMapping("/{id}/accept")
+    @PatchMapping("/{id}/accept")
     public Invite acceptInvite(@PathVariable UUID id,
                                @CurrentUser UUID currentUserId) {
         return inviteService.updateInvite(id, InviteStatus.ACCEPTED, currentUserId);
     }
 
-    @PostMapping("/{id}/decline")
+    @PatchMapping("/{id}/decline")
     public Invite declineInvite(@PathVariable UUID id,
                                @CurrentUser UUID currentUserId) {
         return inviteService.updateInvite(id, InviteStatus.DECLINED, currentUserId);

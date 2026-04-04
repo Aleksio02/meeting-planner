@@ -19,6 +19,7 @@ import ru.epta.mtplanner.meeting.dao.dto.InviteDto;
 import ru.epta.mtplanner.meeting.dao.dto.MeetingDto;
 import ru.epta.mtplanner.meeting.dao.specification.InviteSpecification;
 import ru.epta.mtplanner.meeting.model.Invite;
+import ru.epta.mtplanner.meeting.model.enums.InviteStatus;
 import ru.epta.mtplanner.meeting.model.request.CreateInviteRequest;
 import ru.epta.mtplanner.meeting.model.request.GetListInviteRequest;
 
@@ -123,5 +124,28 @@ public class InviteServiceImpl implements InviteService {
         }
 
         inviteDao.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public Invite updateInvite(UUID id, InviteStatus status, UUID currentUserId) {
+        InviteDto inviteDto = inviteDao.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Invite not found with id: " + id));
+
+        UUID ownerID = inviteDto.getMeeting().getOwnerId().getId();
+
+        if (!currentUserId.equals(ownerID)) {
+            throw new AccessForbiddenException("You are not the owner of the meeting. Only the meeting owner can update invites.");
+        }
+
+        inviteDto.setStatus(status);
+
+        InviteDto savedInvite = inviteDao.save(inviteDto);
+
+        Invite invite = new Invite();
+        InviteConverter inviteConverter = new InviteConverter();
+        inviteConverter.fromDto(savedInvite, invite);
+
+        return invite;
     }
 }

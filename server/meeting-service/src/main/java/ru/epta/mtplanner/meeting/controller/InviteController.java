@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import ru.epta.mtplanner.meeting.config.annotation.CurrentUser;
 import ru.epta.mtplanner.meeting.model.Invite;
+import ru.epta.mtplanner.meeting.model.enums.InviteStatus;
 import ru.epta.mtplanner.meeting.model.request.CreateInviteRequest;
 import ru.epta.mtplanner.meeting.model.request.GetListInviteRequest;
 import ru.epta.mtplanner.meeting.service.InviteService;
@@ -45,5 +46,17 @@ public class InviteController {
     public void deleteInvite(@PathVariable UUID id,
                              @CurrentUser UUID currentUserId) {
         inviteService.deleteInvite(id, currentUserId);
+    }
+
+    @PatchMapping("/{id}/accept")
+    public Invite acceptInvite(@PathVariable UUID id,
+                               @CurrentUser UUID currentUserId) {
+        return inviteService.updateInvite(id, InviteStatus.ACCEPTED, currentUserId);
+    }
+
+    @PatchMapping("/{id}/decline")
+    public Invite declineInvite(@PathVariable UUID id,
+                               @CurrentUser UUID currentUserId) {
+        return inviteService.updateInvite(id, InviteStatus.DECLINED, currentUserId);
     }
 }

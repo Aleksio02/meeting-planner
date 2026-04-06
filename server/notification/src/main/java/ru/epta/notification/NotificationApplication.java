@@ -1,4 +1,4 @@
-package ru.epta.tramplin.notification;
+package ru.epta.notification;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

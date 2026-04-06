@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Room Chat</title>
+    <script src="/webjars/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/2.3.4/stomp.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 20px; }
+      .chat-container { max-width: 600px; margin: 0 auto; }
+      .controls { margin-bottom: 20px; padding: 10px; background: #f5f5f5; border-radius: 5px; }
+      .controls label { display: inline-block; width: 100px; }
+      .controls input { margin-right: 15px; padding: 5px; }
+      button { padding: 5px 15px; cursor: pointer; }
+      .chat-area { border: 1px solid #ccc; border-radius: 5px; padding: 10px; height: 400px; overflow-y: auto; background: #fafafa; }
+      .message-input { margin-top: 10px; display: flex; }
+      .message-input input { flex: 1; padding: 8px; margin-right: 10px; }
+      .status { margin-top: 10px; font-size: 0.9em; color: #666; }
+      .message { margin-bottom: 8px; padding: 5px; border-bottom: 1px solid #eee; }
+      .message .sender { font-weight: bold; color: #2c3e50; }
+      .message .content { margin-left: 10px; }
+      .message .timestamp { font-size: 0.7em; color: #999; float: right; }
+    </style>
+</head>
+<body>
+<div class="chat-container">
+    <h2>WebSocket Room Chat</h2>
+    <div class="controls">
+        <label>Your name:</label>
+        <input type="text" id="username" placeholder="Enter username" value=Math.floor(Math.random() * 1000)>
+        <label>Room ID:</label>
+        <input type="text" id="roomId" placeholder="Meeting name" value="general">
+        <button id="joinBtn">Join Room</button>
+        <span id="roomStatus" style="margin-left: 15px;"></span>
+    </div>
+    <div class="chat-area" id="chatArea">
+        <div class="message system">Welcome! Enter a username, choose a room and click "Join Room".</div>
+    </div>
+    <div class="message-input">
+        <input type="text" id="messageInput" placeholder="Type a message..." disabled>
+        <button id="sendBtn" disabled>Send</button>
+    </div>
+    <div class="status" id="connectionStatus">Disconnected</div>
+</div>
+
+<script>
+  let stompClient = null;
+  let currentSubscription = null; // храним объект подписки для отписки
+  let currentRoom = null;          // текущая комната
+
+  function connect() {
+    const socket = new SockJS('/ws');
+    stompClient = Stomp.over(socket);
+    stompClient.connect({}, function(frame) {
+      console.log('Connected: ' + frame);
+      $('#connectionStatus').text('Connected').css('color', 'green');
+      // После подключения автоматически не подписываемся – ждём явной команды Join
+    }, function(error) {
+      console.error('Connection error', error);
+      $('#connectionStatus').text('Connection error').css('color', 'red');
+    });
+  }
+
+  function joinRoom() {
+    const username = $('#username').val().trim();
+    const roomId = $('#roomId').val().trim();
+
+    if (!username) {
+      alert('Please enter your username');
+      return;
+    }
+    if (!roomId) {
+      alert('Please enter room ID');
+      return;
+    }
+    if (!stompClient || !stompClient.connected) {
+      alert('WebSocket not connected. Please refresh and try again.');
+      return;
+    }
+
+    // Если уже подписаны на другую комнату, отписываемся
+    if (currentSubscription) {
+      currentSubscription.unsubscribe();
+      addSystemMessage(`Left room "${currentRoom}"`);
+    }
+
+    // Подписываемся на новую комнату
+    const destination = '/meeting/' + roomId;
+    currentSubscription = stompClient.subscribe(destination, function(message) {
+      const msg = JSON.parse(message.body)
+      console.log("Received message: " + message)
+      console.log(message.body)
+      displayMessage(msg);
+    });
+
+    currentRoom = roomId;
+    $('#roomStatus').text(`Current room: ${roomId}`).css('color', 'green');
+    addSystemMessage(`You joined room "${roomId}" as "${username}"`);
+
+    // Активируем поле ввода и кнопку отправки
+    $('#messageInput').prop('disabled', false);
+    $('#sendBtn').prop('disabled', false);
+    $('#messageInput').focus();
+  }
+
+  function sendMessage() {
+    const content = $('#messageInput').val().trim();
+    if (!content) return;
+
+    const username = $('#username').val().trim();
+    const meetingId = currentRoom;
+
+    if (!meetingId) {
+      alert('Please join a room first');
+      return;
+    }
+
+    const message = {
+      meetingId: meetingId,
+      sender: username,
+      message: content,
+      // timestamp: new Date().toISOString()
+    };
+
+    stompClient.send('/app/meeting.send', {}, JSON.stringify(message));
+    $('#messageInput').val('');
+  }
+
+  function displayMessage(msg) {
+    // const timestamp = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : '';
+    const isCurrent = $('#username').val().trim() === msg.sender;
+
+
+    const html = `<div class="message">
+                        <span class="sender">${escapeHtml(msg.sender)} ${isCurrent?"(You)":""}:</span>
+                        <span class="content">${escapeHtml(msg.message)}</span>
+                      </div>`;
+    $('#chatArea').append(html);
+    $('#chatArea').scrollTop($('#chatArea')[0].scrollHeight);
+  }
+
+  function addSystemMessage(text) {
+    const html = `<div class="message system" style="color: #777; font-style: italic;">${escapeHtml(text)}</div>`;
+    $('#chatArea').append(html);
+    $('#chatArea').scrollTop($('#chatArea')[0].scrollHeight);
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
+  $(document).ready(function() {
+    connect();
+    $('#joinBtn').click(joinRoom);
+    $('#sendBtn').click(sendMessage);
+    $('#messageInput').keypress(function(e) {
+      if (e.which === 13) sendMessage();
+    });
+  });
+</script>
+</body>
+</html>

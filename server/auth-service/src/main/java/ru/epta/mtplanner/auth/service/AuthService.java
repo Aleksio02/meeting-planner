@@ -1,9 +1,9 @@
 package ru.epta.mtplanner.auth.service;
 
 import org.springframework.stereotype.Service;
-import ru.epta.mtplanner.auth.model.TokenPayload;
 import ru.epta.mtplanner.auth.model.request.Authorization;
 import ru.epta.mtplanner.auth.model.response.AuthResponse;
+import ru.epta.mtplanner.commons.model.TokenPayload;
 
 @Service
 public interface AuthService {

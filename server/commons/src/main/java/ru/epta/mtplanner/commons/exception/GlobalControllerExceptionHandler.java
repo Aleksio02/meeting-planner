@@ -7,6 +7,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import ru.epta.mtplanner.commons.model.response.ErrorResponse;
 
 import java.util.stream.Collectors;
@@ -53,6 +55,18 @@ public class GlobalControllerExceptionHandler {
                 .collect(Collectors.joining(", "));
 
         return buildErrorResponse(HttpStatus.BAD_REQUEST, errorMessage);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException exception, WebRequest request) {
+        String message = "Cannot delete meeting because it has associated invites";
+
+        if (exception.getMessage().contains("foreign key constraint") ||
+                exception.getMessage().contains("invites_meeting_id_fkey")) {
+            return buildErrorResponse(HttpStatus.CONFLICT, message);
+        }
+
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Data integrity violation");
     }
 
     private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message) {

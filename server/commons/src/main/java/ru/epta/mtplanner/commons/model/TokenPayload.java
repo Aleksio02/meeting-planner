@@ -1,4 +1,4 @@
-package ru.epta.mtplanner.auth.model;
+package ru.epta.mtplanner.commons.model;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;

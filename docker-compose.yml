@@ -1,14 +1,15 @@
 services:
   postgres:
     container_name: mtp_db
-    image: postgres
+    image: postgres:17-alpine
     environment:
       POSTGRES_DB: mt_planner
       POSTGRES_USER: mtp_admin
       POSTGRES_PASSWORD: mtp_admin
-      PGDATA: /data/postgres
     ports:
       - "5432:5432"
+    volumes:
+      - mtp_data:/var/lib/postgresql/data
     restart: unless-stopped
 
   redis:
@@ -17,3 +18,6 @@ services:
     command: redis-server --save 20 1 --loglevel warning --requirepass mtp_token
     ports:
       - "6379:6379"
+
+volumes:
+  mtp_data:

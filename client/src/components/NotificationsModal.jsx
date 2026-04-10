@@ -1,35 +1,49 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '../styles/NotificationsModal.css';
 
 const NotificationsModal = ({ isOpen, onClose, anchorRef }) => {
   const [position, setPosition] = useState({ top: 0, left: 0 });
+  const [isPositioned, setIsPositioned] = useState(false);
+  const modalRef = useRef(null);
 
   const updatePosition = () => {
     if (anchorRef?.current) {
       const rect = anchorRef.current.getBoundingClientRect();
-
+      
+      // Получаем ширину модалки после рендера
+      const modalWidth = modalRef.current?.offsetWidth || 300;
+      
       setPosition({
         top: rect.bottom + 10,
-        left: rect.right
+        left: rect.right - modalWidth  // Сразу вычисляем правильную позицию
       });
+      setIsPositioned(true);
     }
   };
 
   useEffect(() => {
     if (isOpen) {
-      updatePosition();
+      setIsPositioned(false);
+      // Небольшая задержка чтобы DOM успел отрисоваться
+      setTimeout(() => {
+        updatePosition();
+      }, 10);
     }
   }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
 
-    window.addEventListener('resize', updatePosition);
-    window.addEventListener('scroll', updatePosition);
+    const handleResize = () => {
+      updatePosition();
+    };
+
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('scroll', handleResize);
 
     return () => {
-      window.removeEventListener('resize', updatePosition);
-      window.removeEventListener('scroll', updatePosition);
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleResize);
     };
   }, [isOpen]);
 
@@ -65,11 +79,11 @@ const NotificationsModal = ({ isOpen, onClose, anchorRef }) => {
       <div className="modal-overlay" onClick={onClose} />
 
       <div
-        className="notifications-modal"
+        ref={modalRef}
+        className={`notifications-modal ${!isPositioned ? 'hidden' : ''}`}
         style={{
           top: `${position.top}px`,
-          left: `${position.left}px`,
-          transform: 'translateX(-100%)'
+          left: `${position.left}px`
         }}
       >
         <div className="modal-header">

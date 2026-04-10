@@ -85,7 +85,7 @@
     }
 
     // Подписываемся на новую комнату
-    const destination = '/meeting/' + roomId;
+    const destination = '/notification/' + roomId;
     currentSubscription = stompClient.subscribe(destination, function(message) {
       const msg = JSON.parse(message.body)
       console.log("Received message: " + message)

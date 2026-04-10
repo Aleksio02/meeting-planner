@@ -21,6 +21,7 @@
         <module>commons</module>
         <module>auth-service</module>
         <module>meeting-service</module>
+        <module>notification</module>
     </modules>
 
     <packaging>pom</packaging>

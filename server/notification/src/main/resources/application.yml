@@ -5,3 +5,13 @@ server:
 spring:
   application:
     name: notification
+
+  datasource:
+    url: jdbc:postgresql://64.188.97.232:5432/mt_planner
+    username: mtp_admin
+    password: mtp_admin
+
+  kafka:
+    group-id: meeting-planner
+    primary-topic-name: meeting-planner
+    bootstrap-servers: ${KAFKA_ADDRESS:localhost:9992}

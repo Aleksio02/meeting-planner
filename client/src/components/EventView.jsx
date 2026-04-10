@@ -32,7 +32,8 @@ const EventView = ({ isOpen, onClose, eventId }) => {
         title: "СОЗВОН",
         description: "Обсуждение архитектуры проекта и декомпозиция задач на спринт.",
         date: "07.07.2026",
-        time: "19:00",
+        startTime: "19:00",
+        endTime: "20:30",
         creator: "1mperium",
         participants: [
           { name: "user1@mail.com", status: "accepted" },
@@ -94,8 +95,12 @@ const EventView = ({ isOpen, onClose, eventId }) => {
               <span className="datetime-value">{event.date}</span>
             </div>
             <div className="datetime-item">
-              <span className="datetime-label">Время</span>
-              <span className="datetime-value">{event.time}</span>
+              <span className="datetime-label">Начало</span>
+              <span className="datetime-value">{event.startTime}</span>
+            </div>
+            <div className="datetime-item">
+              <span className="datetime-label">Окончание</span>
+              <span className="datetime-value">{event.endTime}</span>
             </div>
           </div>
 

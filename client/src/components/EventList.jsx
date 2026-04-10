@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import '../styles/EventList.css';
 
-const EventList = ({ selectedDate, onDateChange }) => {
+const EventList = ({ selectedDate, onDateChange, onEventClick }) => {
   const [currentDate, setCurrentDate] = useState(selectedDate || new Date(2025, 6, 3));
 
   const formatDate = (date) => {
@@ -31,6 +31,14 @@ const EventList = ({ selectedDate, onDateChange }) => {
     const today = new Date();
     setCurrentDate(today);
     if (onDateChange) onDateChange(today);
+  };
+
+   // Обработчик клика по событию
+  const handleEventItemClick = (event) => {
+    console.log('Клик по событию:', event);
+    if (onEventClick) {
+      onEventClick(event.id); // Передаём ID события наверх
+    }
   };
 
   const events = [
@@ -70,12 +78,16 @@ const EventList = ({ selectedDate, onDateChange }) => {
 
       <div className="events-container">
         {events.map(event => (
-          <div key={event.id} className="event-item">
+           <div 
+            key={event.id} 
+            className="event-item"
+            onClick={() => handleEventItemClick(event)} // Добавили onClick
+          >
             <div className="event-icon">
               <img 
             src="/src/assets/edit-icon.svg" 
-            alt="Edit"
-          />
+                alt="Edit"
+              />
             </div>
             <span className="event-title">{event.title}</span>
             <span className="event-time">{event.time} {event.date}</span>

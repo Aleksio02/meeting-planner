@@ -4,26 +4,25 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
-import ru.epta.mtplanner.commons.model.notification.SendInviteNotification;
+import ru.epta.mtplanner.commons.model.notification.Notification;
+import ru.epta.notification.service.NotificationService;
 
 @Component
 @KafkaListener(id = "${spring.kafka.group-id}", topics = "${spring.kafka.primary-topic-name}", containerFactory = "kafkaListenerContainerFactory")
 public class MultitypeKafkaListener {
 
-    private final SimpMessagingTemplate simpMessagingTemplate;
+    private NotificationService notificationService;
 
-    public MultitypeKafkaListener(SimpMessagingTemplate simpMessagingTemplate) {
-        this.simpMessagingTemplate = simpMessagingTemplate;
+    public MultitypeKafkaListener(NotificationService notificationService) {
+        this.notificationService = notificationService;
     }
 
     @KafkaHandler
-    public void handleSendInvite(SendInviteNotification request) throws JsonProcessingException {
+    public void handleSendInvite(Notification request) throws JsonProcessingException {
         System.out.println("Processing notification");
         System.out.println(new ObjectMapper().writeValueAsString(request));
-        // TODO: Доработать
-        simpMessagingTemplate.convertAndSend("/notification/%s".formatted("1"), new ObjectMapper().writeValueAsString(request));
+        notificationService.sendNotification(request);
     }
 
 

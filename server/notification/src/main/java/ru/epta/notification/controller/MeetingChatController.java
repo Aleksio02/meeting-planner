@@ -3,8 +3,8 @@ package ru.epta.notification.controller;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-import ru.epta.notification.model.MeetingChatMessage;
 
+// TODO: Delete me
 @Controller
 public class MeetingChatController {
 
@@ -15,10 +15,10 @@ public class MeetingChatController {
     }
 
     @MessageMapping("meeting.send")
-    public void sendToMeeting(MeetingChatMessage meetingChatMessage) {
+    public void sendToMeeting() {
         simpMessagingTemplate.convertAndSend(
-            "/meeting/%s".formatted(meetingChatMessage.getMeetingId()),
-            meetingChatMessage
+            "/meeting/%s".formatted("121"),
+            "Some message"
         );
     }
 }

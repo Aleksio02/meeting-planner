@@ -8,16 +8,15 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
-import ru.epta.notification.handlers.EchoWebSocketHandler;
 
 @Configuration
 @EnableWebSocketMessageBroker
 @EnableWebSocket
-public class WebSockerConfig implements WebSocketMessageBrokerConfigurer, WebSocketConfigurer {
+public class WebSockerConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/meeting", "/queue");
+        config.enableSimpleBroker("/meeting", "/notification");
 
         config.setApplicationDestinationPrefixes("/app");
     }
@@ -27,11 +26,5 @@ public class WebSockerConfig implements WebSocketMessageBrokerConfigurer, WebSoc
         config.addEndpoint("/ws")
             .setAllowedOriginPatterns("*")
             .withSockJS();
-    }
-
-    @Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new EchoWebSocketHandler(), "/raw-ws")
-            .setAllowedOrigins("*");
     }
 }

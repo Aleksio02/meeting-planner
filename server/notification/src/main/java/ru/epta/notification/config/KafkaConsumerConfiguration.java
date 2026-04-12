@@ -16,7 +16,7 @@ import org.springframework.kafka.support.converter.StringJsonMessageConverter;
 import org.springframework.kafka.support.mapping.DefaultJackson2JavaTypeMapper;
 import org.springframework.kafka.support.mapping.Jackson2JavaTypeMapper.TypePrecedence;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
-import ru.epta.mtplanner.commons.model.notification.SendInviteNotification;
+import ru.epta.mtplanner.commons.model.notification.InviteNotification;
 
 @EnableKafka
 @Configuration
@@ -47,7 +47,7 @@ public class KafkaConsumerConfiguration {
         typeMapper.addTrustedPackages("*");
         Map<String, Class<?>> mappings = new HashMap<>();
 
-        mappings.put("send_invite", SendInviteNotification.class);
+        mappings.put("send_invite", InviteNotification.class);
         typeMapper.setIdClassMapping(mappings);
         converter.setTypeMapper(typeMapper);
         return converter;

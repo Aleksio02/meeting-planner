@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import ru.epta.mtplanner.commons.model.notification.Notification;
 
 @Service
-public class KafkaProducer {
+public class NotificationKafkaProducer {
 
     @Autowired
     private NewTopic topic;
@@ -17,7 +17,7 @@ public class KafkaProducer {
     @Autowired
     private KafkaTemplate<String, Object> kafkaTemplate;
 
-    public void sendRequest(Notification request) {
+    public void sendNotification(Notification request) {
 
         CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(topic.name(), request);
 

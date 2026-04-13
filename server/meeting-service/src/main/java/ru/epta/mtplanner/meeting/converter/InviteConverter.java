@@ -2,6 +2,9 @@ package ru.epta.mtplanner.meeting.converter;
 
 import ru.epta.mtplanner.commons.converter.UserConverter;
 import ru.epta.mtplanner.commons.model.User;
+import ru.epta.mtplanner.commons.model.notification.InviteNotification;
+import ru.epta.mtplanner.commons.model.notification.MeetingPreview;
+import ru.epta.mtplanner.commons.model.notification.NotificationType;
 import ru.epta.mtplanner.meeting.dao.dto.InviteDto;
 import ru.epta.mtplanner.meeting.model.Invite;
 import ru.epta.mtplanner.meeting.model.Meeting;
@@ -31,5 +34,19 @@ public class InviteConverter {
 
         destination.setStatus(source.getStatus().getStatus());
         destination.setSentAt(source.getSentAt());
+    }
+
+    public InviteNotification toNotification(Invite source, NotificationType type) {
+        InviteNotification inviteNotification = new InviteNotification(source.getMeetingId().getOwner(), source.getUserId().getId());
+        inviteNotification.setType(type);
+
+        inviteNotification.setInviteId(source.getId());
+
+        MeetingPreview meetingPreview = new MeetingPreview();
+        meetingPreview.setId(source.getMeetingId().getId());
+        meetingPreview.setTitle(source.getMeetingId().getTitle());
+        inviteNotification.setMeeting(meetingPreview);
+
+        return inviteNotification;
     }
 }

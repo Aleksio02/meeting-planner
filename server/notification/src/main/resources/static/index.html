@@ -88,9 +88,12 @@
     const destination = '/notification/' + roomId;
     currentSubscription = stompClient.subscribe(destination, function(message) {
       const msg = JSON.parse(message.body)
+      // const msg = message
       console.log("Received message: " + message)
-      console.log(message.body)
-      displayMessage(msg);
+      console.log(message)
+      console.log("msg")
+      console.log(msg)
+      displayMessage(msg)
     });
 
     currentRoom = roomId;
@@ -133,7 +136,7 @@
 
     const html = `<div class="message">
                         <span class="sender">${escapeHtml(msg.sender)} ${isCurrent?"(You)":""}:</span>
-                        <span class="content">${escapeHtml(msg.message)}</span>
+                        <span class="content">User ${escapeHtml(msg.actor.username)} invited ${escapeHtml(msg.receiver)} to meeting</span>
                       </div>`;
     $('#chatArea').append(html);
     $('#chatArea').scrollTop($('#chatArea')[0].scrollHeight);

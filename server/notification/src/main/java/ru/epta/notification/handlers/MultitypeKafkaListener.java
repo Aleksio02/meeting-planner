@@ -21,7 +21,6 @@ public class MultitypeKafkaListener {
     @KafkaHandler
     public void handleSendInvite(Notification request) throws JsonProcessingException {
         System.out.println("Processing notification");
-        System.out.println(new ObjectMapper().writeValueAsString(request));
         notificationService.sendNotification(request);
     }
 

@@ -8,9 +8,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import ru.epta.mtplanner.auth.model.request.GetListRequest;
 import ru.epta.mtplanner.commons.dao.UserDao;
+import ru.epta.mtplanner.commons.dao.dto.UserDto;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -34,12 +36,23 @@ class UserServiceImplTest {
 
     @Test
     void testSearchUsers_Success() {
-        GetListRequest request = buildRequest("alice", 0, 10);
-        when(userDao.searchUsers("alice", PageRequest.of(0, 10))).thenReturn(List.of());
+        GetListRequest request = buildRequest("o", 0, 10);
 
-        userService.searchUsers(request);
+        UserDto bob = new UserDto();
+        bob.setUsername("Bob");
 
-        verify(userDao).searchUsers("alice", PageRequest.of(0, 10));
+        UserDto maria = new UserDto();
+        maria.setUsername("Maria");
+
+        when(userDao.searchUsers("o", PageRequest.of(0, 10)))
+                .thenReturn(List.of(bob));
+
+        List<UserDto> result = userService.searchUsers(request);
+
+        assertEquals(1, result.size());
+        assertEquals(bob.getUsername(), result.getFirst().getUsername());
+
+        verify(userDao).searchUsers("o", PageRequest.of(0, 10));
         verifyNoMoreInteractions(userDao);
     }
 

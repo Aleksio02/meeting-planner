@@ -8,9 +8,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.epta.mtplanner.commons.converter.UserConverter;
 import ru.epta.mtplanner.commons.dao.UserDao;
 import ru.epta.mtplanner.commons.dao.dto.UserDto;
 import ru.epta.mtplanner.commons.exception.AccessForbiddenException;
+import ru.epta.mtplanner.commons.model.User;
+import ru.epta.mtplanner.commons.model.notification.MeetingNotification;
+import ru.epta.mtplanner.commons.model.notification.MeetingPreview;
+import ru.epta.mtplanner.commons.model.notification.Notification;
+import ru.epta.mtplanner.commons.model.notification.NotificationType;
 import ru.epta.mtplanner.meeting.converter.MeetingConverter;
 import ru.epta.mtplanner.meeting.dao.MeetingDao;
 import ru.epta.mtplanner.meeting.dao.dto.MeetingDto;
@@ -19,6 +25,7 @@ import ru.epta.mtplanner.meeting.model.Meeting;
 import ru.epta.mtplanner.meeting.model.request.CreateMeetingRequest;
 import ru.epta.mtplanner.meeting.model.request.GetListMeetingRequest;
 import ru.epta.mtplanner.meeting.model.request.UpdateMeetingRequest;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,11 +36,12 @@ import java.util.UUID;
 public class MeetingServiceImpl implements MeetingService {
     private final MeetingDao meetingDao;
     private final UserDao userDao;
+    private final NotificationKafkaProducer notificationKafkaProducer;
 
-
-    public MeetingServiceImpl(MeetingDao meetingDao, UserDao userDao) {
+    public MeetingServiceImpl(MeetingDao meetingDao, UserDao userDao, NotificationKafkaProducer notificationKafkaProducer) {
         this.meetingDao = meetingDao;
         this.userDao = userDao;
+        this.notificationKafkaProducer = notificationKafkaProducer;
     }
 
     @Override
@@ -92,6 +100,18 @@ public class MeetingServiceImpl implements MeetingService {
         Meeting meeting = new Meeting();
         MeetingConverter meetingConverter = new MeetingConverter();
         meetingConverter.fromDto(savedMeeting, meeting);
+
+        MeetingPreview meetingPreview = new MeetingPreview();
+        meetingPreview.setId(meeting.getId());
+        meetingPreview.setTitle(meeting.getTitle());
+
+        User actor = new User();
+        UserConverter userConverter = new UserConverter();
+        userConverter.fromDto(owner, actor);
+
+        MeetingNotification notification = new MeetingNotification(actor, meetingPreview, NotificationType.MEETING_CREATED);
+        notificationKafkaProducer.sendNotification(notification);
+
         return meeting;
     }
 

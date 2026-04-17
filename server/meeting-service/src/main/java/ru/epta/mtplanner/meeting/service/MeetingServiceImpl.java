@@ -109,7 +109,7 @@ public class MeetingServiceImpl implements MeetingService {
         UserConverter userConverter = new UserConverter();
         userConverter.fromDto(owner, actor);
 
-        MeetingNotification notification = new MeetingNotification(actor, meetingPreview, NotificationType.MEETING_CREATED);
+        MeetingNotification notification = new MeetingNotification(actor, meetingPreview, NotificationType.CREATE_MEETING);
         notificationKafkaProducer.sendNotification(notification);
 
         return meeting;

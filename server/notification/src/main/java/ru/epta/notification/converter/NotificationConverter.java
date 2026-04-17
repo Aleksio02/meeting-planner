@@ -24,7 +24,7 @@ public class NotificationConverter {
                 destination.setMeetingId(inviteNotification.getMeeting().getId());
                 destination.setInviteId(inviteNotification.getInviteId());
             }
-            case MEETING_CREATED -> {
+            case CREATE_MEETING -> {
                 MeetingNotification meetingNotification = (MeetingNotification) source;
                 destination.setMeetingId(meetingNotification.getMeeting().getId());
             }

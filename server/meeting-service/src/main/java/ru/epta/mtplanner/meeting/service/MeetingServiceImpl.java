@@ -16,10 +16,13 @@ import ru.epta.mtplanner.meeting.dao.MeetingDao;
 import ru.epta.mtplanner.meeting.dao.dto.MeetingDto;
 import ru.epta.mtplanner.meeting.dao.specification.MeetingSpecification;
 import ru.epta.mtplanner.meeting.model.Meeting;
+import ru.epta.mtplanner.meeting.model.enums.MeetingStatus;
+import ru.epta.mtplanner.meeting.model.request.CancelMeetingRequest;
 import ru.epta.mtplanner.meeting.model.request.CreateMeetingRequest;
 import ru.epta.mtplanner.meeting.model.request.GetListMeetingRequest;
 import ru.epta.mtplanner.meeting.model.request.UpdateMeetingRequest;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -134,6 +137,34 @@ public class MeetingServiceImpl implements MeetingService {
         MeetingConverter meetingConverter = new MeetingConverter();
         meetingConverter.fromDto(savedMeeting, meeting);
 
+        return meeting;
+    }
+
+    @Override
+    public Meeting cancelMeeting(UUID id, CancelMeetingRequest request, UUID currentUserId) {
+        MeetingDto meetingDto = meetingDao.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Meeting not found with id: " + id));
+
+        UUID ownerId = meetingDto.getOwnerId().getId();
+
+        if (!currentUserId.equals(ownerId)) {
+            throw new AccessForbiddenException("You are not the owner of the meeting. Only the meeting owner can update it.");
+        }
+
+        if (meetingDto.getStatus() == MeetingStatus.CANCELED) {
+            throw new IllegalStateException("Meeting is already cancelled");
+        }
+
+        meetingDto.setStatus(MeetingStatus.CANCELED);
+        meetingDto.setCancellationReason(request.getReason());
+        meetingDto.setCancelledAt(LocalDateTime.now());
+
+        //TODO: Сделать уведомление
+
+        MeetingDto cancelledMeeting = meetingDao.save(meetingDto);
+
+        Meeting meeting = new Meeting();
+        new MeetingConverter().fromDto(cancelledMeeting, meeting);
         return meeting;
     }
 

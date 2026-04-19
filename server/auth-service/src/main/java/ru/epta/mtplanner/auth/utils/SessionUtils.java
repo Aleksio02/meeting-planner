@@ -4,14 +4,19 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+import org.springframework.stereotype.Component;
+import ru.epta.mtplanner.commons.model.TokenPayload;
+
 import java.security.SecureRandom;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Component;
-import ru.epta.mtplanner.commons.model.TokenPayload;
 
 @Component
 public class SessionUtils {
@@ -38,6 +43,33 @@ public class SessionUtils {
 
     public TokenPayload getSession(String sessionId) {
         return readAsTokenPayload(redisTemplate.opsForValue().get(sessionId));
+    }
+
+    public void writeSessionCookie(
+            HttpServletResponse response,
+            String sessionId
+    ) {
+        response.addHeader(
+                HttpHeaders.SET_COOKIE,
+                buildCookie(
+                        sessionId,
+                        Duration.ofSeconds(3600)
+                ).toString()
+        );
+    }
+
+    private ResponseCookie buildCookie(
+            String value,
+            Duration maxAge
+    ) {
+        return ResponseCookie
+                .from("sessionId", value)
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(maxAge)
+                .build();
     }
 
     public TokenPayload extendSession(String sessionId) {

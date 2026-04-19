@@ -1,0 +1,402 @@
+/* ---------- Основная модалка ---------- */
+.event-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 999;
+    transition: opacity 0.2s ease;
+}
+
+.event-overlay.closing {
+    opacity: 0;
+}
+
+.event-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    max-height: 90vh;
+    background-color: #4e453d;
+    border-radius: 25px;
+    border: 1px solid #404040;
+    z-index: 1000;
+    font-family: 'Open Sans', sans-serif;
+    display: flex;
+    flex-direction: column;
+    opacity: 1;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.event-modal.closing {
+    opacity: 0;
+    transform: translate(-50%, -45%);
+}
+
+.event-close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: #808080;
+    font-size: 24px;
+    cursor: pointer;
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.event-close-btn:hover {
+    background-color: #404040;
+    color: #fbb564;
+}
+
+.event-content {
+    padding: 35px 30px 25px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.event-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.event-content::-webkit-scrollbar-track {
+    background: #2b2b2b;
+    border-radius: 3px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.event-content::-webkit-scrollbar-thumb {
+    background: #fbb564;
+    border-radius: 3px;
+}
+
+.event-content::-webkit-scrollbar-thumb:hover {
+    background: #ffa53e;
+}
+
+/* ---------- Тексты и блоки ---------- */
+.event-title-modal {
+    color: #fbb564;
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0 0 25px;
+    text-align: center;
+}
+
+.event-datetime {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.datetime-item {
+    flex: 1;
+    background-color: #3a3a3a;
+    border-radius: 12px;
+    padding: 15px;
+    border: 1px solid #4a4a4a;
+}
+
+.datetime-label {
+    display: block;
+    color: #fbb564;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.datetime-value {
+    display: block;
+    color: #fff;
+    font-size: 16px;
+}
+
+.section-label {
+    display: block;
+    color: #fbb564;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.description-section,
+.creator-section,
+.participants-section {
+    background-color: #3a3a3a;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #4a4a4a;
+}
+
+.description-text {
+    color: #fff;
+    font-size: 15px;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.creator-name {
+    color: #fff;
+    font-size: 16px;
+}
+
+/* ---------- Секция участников (Новая) ---------- */
+.participants-list-static {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.participant-pill {
+    background-color: #4e453d;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    border: 1px solid #5a5a5a;
+    word-break: break-all;
+}
+
+.participant-pill.more {
+    background-color: transparent;
+    border: 1px dashed #fbb564;
+    color: #fbb564;
+}
+
+.invite-trigger-btn {
+    width: 100%;
+    background: none;
+    border: 1px solid #fbb564;
+    color: #fbb564;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.invite-trigger-btn:hover {
+    background: rgba(251, 181, 100, 0.1);
+}
+
+/* ---------- Модалка приглашения (Новая) ---------- */
+.invite-modal-overlay {
+    position: fixed;
+    top: 0; 
+    left: 0; 
+    right: 0; 
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1100;
+    backdrop-filter: blur(2px);
+}
+
+.invite-modal {
+    background: #4e453d;
+    width: 400px;
+    border-radius: 15px;
+    border: 1px solid #fbb564;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    font-family: 'Open Sans', sans-serif;
+}
+
+.invite-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: #3a3a3a;
+    border-bottom: 1px solid #4a4a4a;
+}
+
+.invite-header h3 {
+    margin: 0;
+    color: #fbb564;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.invite-header button {
+    background: none;
+    border: none;
+    color: #808080;
+    cursor: pointer;
+    font-size: 20px;
+    transition: color 0.2s ease;
+}
+
+.invite-header button:hover {
+    color: #fbb564;
+}
+
+.invite-body {
+    padding: 20px;
+}
+
+.participant-input {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 10px;
+    border: 1px solid #4a4a4a;
+    background-color: #3a3a3a;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+}
+
+.participant-input:focus {
+    border-color: #fbb564;
+}
+
+.invite-suggestions {
+    margin-top: 15px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.invite-suggestions::-webkit-scrollbar {
+    width: 4px;
+}
+
+.invite-suggestions::-webkit-scrollbar-track {
+    background: #2b2b2b;
+    border-radius: 2px;
+}
+
+.invite-suggestions::-webkit-scrollbar-thumb {
+    background: #fbb564;
+    border-radius: 2px;
+}
+
+.suggestion-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    color: #fff;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+    border-radius: 8px;
+    margin-bottom: 5px;
+}
+
+.suggestion-item:last-child {
+    margin-bottom: 0;
+}
+
+.suggestion-item:hover {
+    background-color: #3a3a3a;
+}
+
+.no-suggestions {
+    color: #888;
+    text-align: center;
+    font-size: 13px;
+    padding: 15px;
+}
+
+/* ---------- Кнопки действий ---------- */
+.event-action {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    padding-bottom: 10px;
+}
+
+.leave-btn {
+    background-color: transparent;
+    border: 2px solid #ff6b6b;
+    color: #ff6b6b;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 12px 40px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.leave-btn:hover {
+    background-color: #ff6b6b;
+    color: #3e3731;
+}
+/* Статусы в пиллах */
+.participant-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #4e453d;
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    border: 1px solid #5a5a5a;
+    transition: all 0.2s ease;
+}
+
+.status-icon {
+    font-size: 12px;
+    line-height: 1;
+}
+
+.status-icon.accepted { color: #4ade80; } /* Зеленый */
+.status-icon.declined { color: #f87171; } /* Красный */
+.status-icon.pending  { color: #fbbf24; } /* Желтый */
+
+.p-name {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Кнопка "и еще / скрыть" */
+.more-btn {
+    background-color: transparent;
+    border: 1px dashed #fbb564;
+    color: #fbb564;
+    cursor: pointer;
+}
+
+.more-btn:hover {
+    background-color: rgba(251, 181, 100, 0.1);
+    border-style: solid;
+}
+
+/* Скролл для большого списка участников внутри модалки */
+.participants-list-static {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+    max-height: 200px; /* Чтобы модалка не улетела в космос */
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.participants-list-static::-webkit-scrollbar { width: 4px; }
+.participants-list-static::-webkit-scrollbar-thumb { 
+    background: #fbb564; 
+    border-radius: 10px; 
+}
+
+/* Остальные стили из прошлых ответов (оверлей, модалка и т.д.) */
+/* ... (сохрани свои предыдущие стили для фона и кнопок) ... */

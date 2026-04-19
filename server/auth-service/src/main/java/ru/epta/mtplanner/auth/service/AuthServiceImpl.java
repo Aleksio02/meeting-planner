@@ -47,7 +47,7 @@ public class AuthServiceImpl implements AuthService {
         String password = request.getPassword();
 
         UserDto userDto = userDao.findByUsernameOrEmail(login)
-            .orElseThrow(() -> new UnauthorizedException("User not found"));
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
 
         if (!PasswordEncoder.matches(password, userDto.getPassword())) {
             throw new UnauthorizedException("Invalid password");
@@ -92,7 +92,14 @@ public class AuthServiceImpl implements AuthService {
                 sessionUtils.deleteSession(sessionId);
                 throw sessionHasBeenFinishedException;
             }
-            return sessionUtils.extendSession(sessionId);
+
+            UserDto userDto = userDao.findById(tokenPayload.getUserId()).get();
+            User user = new User();
+            new UserConverter().fromDto(userDto, user);
+            tokenPayload.setCurrentUser(user);
+            sessionUtils.extendSession(sessionId);
+
+            return tokenPayload;
         } catch (Exception e) {
             throw sessionHasBeenFinishedException;
         }

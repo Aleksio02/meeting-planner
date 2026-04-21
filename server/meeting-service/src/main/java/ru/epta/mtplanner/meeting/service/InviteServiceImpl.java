@@ -12,6 +12,7 @@ import ru.epta.mtplanner.commons.dao.UserDao;
 import ru.epta.mtplanner.commons.dao.dto.UserDto;
 import ru.epta.mtplanner.commons.exception.AccessForbiddenException;
 import ru.epta.mtplanner.commons.exception.IncorrectRequestDataException;
+import ru.epta.mtplanner.commons.model.notification.NotificationType;
 import ru.epta.mtplanner.meeting.converter.InviteConverter;
 import ru.epta.mtplanner.meeting.dao.InviteDao;
 import ru.epta.mtplanner.meeting.dao.MeetingDao;
@@ -31,22 +32,30 @@ import java.util.stream.Collectors;
 @Primary
 @Service
 public class InviteServiceImpl implements InviteService {
+
     private final MeetingDao meetingDao;
     private final UserDao userDao;
     private final InviteDao inviteDao;
+    private final NotificationKafkaProducer notificationKafkaProducer;
 
 
-    public InviteServiceImpl(MeetingDao meetingDao, UserDao userDao, InviteDao inviteDao) {
+    public InviteServiceImpl(
+        MeetingDao meetingDao,
+        UserDao userDao,
+        InviteDao inviteDao,
+        NotificationKafkaProducer notificationKafkaProducer
+    ) {
         this.meetingDao = meetingDao;
         this.userDao = userDao;
         this.inviteDao = inviteDao;
+        this.notificationKafkaProducer = notificationKafkaProducer;
     }
 
     @Override
     public Invite getInviteById(UUID id) {
 
         InviteDto inviteDto = inviteDao.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Invite not found with id: " + id));
+            .orElseThrow(() -> new EntityNotFoundException("Invite not found with id: " + id));
 
         Invite invite = new Invite();
         InviteConverter inviteConverter = new InviteConverter();
@@ -83,14 +92,15 @@ public class InviteServiceImpl implements InviteService {
     @Transactional
     public Invite createInvite(CreateInviteRequest request, UUID currentId) {
         MeetingDto meetingDto = meetingDao.findById(request.getMeetingId())
-                .orElseThrow(() -> new EntityNotFoundException("Meeting not found with id: " + request.getMeetingId()));
+            .orElseThrow(() -> new EntityNotFoundException("Meeting not found with id: " + request.getMeetingId()));
 
         if (!meetingDto.getOwnerId().getId().equals(currentId)) {
-            throw new AccessForbiddenException("You are not the owner of this meeting. Only the meeting owner can create invites.");
+            throw new AccessForbiddenException(
+                "You are not the owner of this meeting. Only the meeting owner can create invites.");
         }
 
         UserDto userDto = userDao.findById(request.getUserId())
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + request.getUserId()));
+            .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + request.getUserId()));
 
         if (userDto.getId().equals(currentId)) {
             throw new IncorrectRequestDataException("You are owner of this meeting.");
@@ -107,6 +117,8 @@ public class InviteServiceImpl implements InviteService {
         Invite invite = new Invite();
         InviteConverter inviteConverter = new InviteConverter();
         inviteConverter.fromDto(savedInvite, invite);
+
+        notificationKafkaProducer.sendNotification(inviteConverter.toNotification(invite, NotificationType.SEND_INVITE));
 
         return invite;
     }

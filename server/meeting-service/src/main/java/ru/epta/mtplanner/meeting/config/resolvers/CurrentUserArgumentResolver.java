@@ -2,12 +2,8 @@ package ru.epta.mtplanner.meeting.config.resolvers;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.Arrays;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.context.annotation.Scope;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -16,8 +12,12 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import ru.epta.mtplanner.commons.exception.UnauthorizedException;
 import ru.epta.mtplanner.commons.model.TokenPayload;
+import ru.epta.mtplanner.commons.model.User;
 import ru.epta.mtplanner.meeting.config.annotation.CurrentUser;
 import ru.epta.mtplanner.meeting.connector.AuthConnector;
+
+import java.util.Arrays;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -28,7 +28,8 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         return parameter.hasParameterAnnotation(CurrentUser.class)
-               && parameter.getParameterType().equals(UUID.class);
+               && (parameter.getParameterType().equals(UUID.class)
+                    || parameter.getParameterType().equals(User.class));
     }
 
     @Override
@@ -45,8 +46,10 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
         AuthConnector authConnector = authConnectorProvider.getIfAvailable();
 
         TokenPayload tokenPayload = authConnector.validateSession(sessionId);
-
-        return tokenPayload.getUserId();
+        if (parameter.getParameterType().equals(UUID.class)) {
+            return tokenPayload.getUserId();
+        }
+        return tokenPayload.getCurrentUser();
     }
 
     private String extractSession(HttpServletRequest request) {

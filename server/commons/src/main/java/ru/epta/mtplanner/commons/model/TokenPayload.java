@@ -8,12 +8,13 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import java.io.IOException;
-import java.time.Instant;
-import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.io.IOException;
+import java.time.Instant;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -21,6 +22,8 @@ import lombok.Setter;
 public class TokenPayload {
 
     private UUID userId;
+
+    private User currentUser;
 
     @JsonSerialize(using = CustomInstantSerializer.class)
     @JsonDeserialize(using = CustomInstantDeserializer.class)
@@ -43,7 +46,7 @@ public class TokenPayload {
     static class CustomInstantSerializer extends JsonSerializer<Instant> {
         @Override
         public void serialize(Instant value, JsonGenerator gen, SerializerProvider serializers)
-            throws IOException {
+                throws IOException {
             gen.writeString(value.toString());
         }
     }
@@ -51,7 +54,7 @@ public class TokenPayload {
     static class CustomInstantDeserializer extends JsonDeserializer<Instant> {
         @Override
         public Instant deserialize(JsonParser p, DeserializationContext ctxt)
-            throws IOException {
+                throws IOException {
             return Instant.parse(p.getValueAsString());
         }
     }

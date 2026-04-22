@@ -144,19 +144,22 @@ public class InviteServiceImpl implements InviteService {
         InviteDto inviteDto = inviteDao.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Invite not found with id: " + id));
 
-        UUID ownerID = inviteDto.getMeeting().getOwnerId().getId();
+        UUID invitedId = inviteDto.getUser().getId();
 
-        if (!currentUserId.equals(ownerID)) {
-            throw new AccessForbiddenException("You are not the owner of the meeting. Only the meeting owner can update invites.");
+        if (!currentUserId.equals(invitedId)) {
+            throw new AccessForbiddenException("You are not the invited user.");
         }
 
         inviteDto.setStatus(status);
-
         InviteDto savedInvite = inviteDao.save(inviteDto);
 
         Invite invite = new Invite();
         InviteConverter inviteConverter = new InviteConverter();
         inviteConverter.fromDto(savedInvite, invite);
+
+        UUID receiver = invite.getMeetingId().getOwner().getId();
+
+        notificationKafkaProducer.sendNotification(inviteConverter.toResponseNotification(invite, receiver, status));
 
         return invite;
     }

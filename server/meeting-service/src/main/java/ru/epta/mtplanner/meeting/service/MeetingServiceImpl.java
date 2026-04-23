@@ -15,34 +15,40 @@ import ru.epta.mtplanner.commons.exception.AccessForbiddenException;
 import ru.epta.mtplanner.commons.model.User;
 import ru.epta.mtplanner.commons.model.notification.MeetingNotification;
 import ru.epta.mtplanner.commons.model.notification.MeetingPreview;
-import ru.epta.mtplanner.commons.model.notification.Notification;
 import ru.epta.mtplanner.commons.model.notification.NotificationType;
 import ru.epta.mtplanner.meeting.converter.MeetingConverter;
+import ru.epta.mtplanner.meeting.dao.InviteDao;
 import ru.epta.mtplanner.meeting.dao.MeetingDao;
+import ru.epta.mtplanner.meeting.dao.dto.InviteDto;
 import ru.epta.mtplanner.meeting.dao.dto.MeetingDto;
 import ru.epta.mtplanner.meeting.dao.specification.MeetingSpecification;
 import ru.epta.mtplanner.meeting.model.Meeting;
+import ru.epta.mtplanner.meeting.model.enums.InviteStatus;
 import ru.epta.mtplanner.meeting.model.enums.MeetingStatus;
 import ru.epta.mtplanner.meeting.model.request.CancelMeetingRequest;
 import ru.epta.mtplanner.meeting.model.request.CreateMeetingRequest;
 import ru.epta.mtplanner.meeting.model.request.GetListMeetingRequest;
 import ru.epta.mtplanner.meeting.model.request.UpdateMeetingRequest;
 
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Primary
 @Service
 public class MeetingServiceImpl implements MeetingService {
     private final MeetingDao meetingDao;
+
+    private final InviteDao inviteDao;
+
     private final UserDao userDao;
     private final NotificationKafkaProducer notificationKafkaProducer;
 
-    public MeetingServiceImpl(MeetingDao meetingDao, UserDao userDao, NotificationKafkaProducer notificationKafkaProducer) {
+    public MeetingServiceImpl(MeetingDao meetingDao, InviteDao inviteDao, UserDao userDao, NotificationKafkaProducer notificationKafkaProducer) {
         this.meetingDao = meetingDao;
+        this.inviteDao = inviteDao;
         this.userDao = userDao;
         this.notificationKafkaProducer = notificationKafkaProducer;
     }
@@ -161,6 +167,7 @@ public class MeetingServiceImpl implements MeetingService {
     }
 
     @Override
+    @Transactional
     public Meeting cancelMeeting(UUID id, CancelMeetingRequest request, UUID currentUserId) {
         MeetingDto meetingDto = meetingDao.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Meeting not found with id: " + id));
@@ -179,12 +186,19 @@ public class MeetingServiceImpl implements MeetingService {
         meetingDto.setCancellationReason(request.getReason());
         meetingDto.setCancelledAt(LocalDateTime.now());
 
-        //TODO: Сделать уведомление
-
         MeetingDto cancelledMeeting = meetingDao.save(meetingDto);
 
         Meeting meeting = new Meeting();
-        new MeetingConverter().fromDto(cancelledMeeting, meeting);
+        MeetingConverter meetingConverter = new MeetingConverter();
+        meetingConverter.fromDto(cancelledMeeting, meeting);
+
+        List<InviteDto> participants = inviteDao.findAllByMeetingIdAndStatus(meetingDto.getId(), InviteStatus.ACCEPTED);
+        List<UUID> participantIds = participants.stream()
+                .map(inv -> inv.getUser().getId())
+                .toList();
+
+        notificationKafkaProducer.sendNotification(meetingConverter.toNotification(meeting, NotificationType.CANCEL_MEETING, request.getReason(), participantIds));
+
         return meeting;
     }
 

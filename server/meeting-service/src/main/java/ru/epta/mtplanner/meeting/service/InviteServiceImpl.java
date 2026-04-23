@@ -157,9 +157,14 @@ public class InviteServiceImpl implements InviteService {
         InviteConverter inviteConverter = new InviteConverter();
         inviteConverter.fromDto(savedInvite, invite);
 
-        UUID receiver = invite.getMeetingId().getOwner().getId();
+        NotificationType notificationType;
+        if (status == InviteStatus.ACCEPTED) {
+            notificationType = NotificationType.ACCEPT_INVITE;
+        } else {
+            notificationType = NotificationType.DECLINE_INVITE;
+        }
 
-        notificationKafkaProducer.sendNotification(inviteConverter.toResponseNotification(invite, receiver, status));
+        notificationKafkaProducer.sendNotification(inviteConverter.toNotification(invite, notificationType));
 
         return invite;
     }

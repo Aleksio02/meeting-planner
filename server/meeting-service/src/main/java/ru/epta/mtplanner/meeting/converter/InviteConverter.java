@@ -3,7 +3,6 @@ package ru.epta.mtplanner.meeting.converter;
 import ru.epta.mtplanner.commons.converter.UserConverter;
 import ru.epta.mtplanner.commons.model.User;
 import ru.epta.mtplanner.commons.model.notification.InviteNotification;
-import ru.epta.mtplanner.commons.model.notification.InviteResponseNotification;
 import ru.epta.mtplanner.commons.model.notification.MeetingPreview;
 import ru.epta.mtplanner.commons.model.notification.NotificationType;
 import ru.epta.mtplanner.meeting.dao.dto.InviteDto;
@@ -41,8 +40,18 @@ public class InviteConverter {
     }
 
     public InviteNotification toNotification(Invite source, NotificationType type) {
-        InviteNotification inviteNotification = new InviteNotification(source.getMeetingId().getOwner(), source.getUserId().getId());
-        inviteNotification.setType(type);
+        User actor;
+        UUID receiver;
+
+        if (type == NotificationType.SEND_INVITE) {
+            actor = source.getMeetingId().getOwner();
+            receiver = source.getUserId().getId();
+        } else {
+            actor = source.getUserId();
+            receiver = source.getMeetingId().getOwner().getId();
+        }
+
+        InviteNotification inviteNotification = new InviteNotification(actor, receiver, type);
 
         inviteNotification.setInviteId(source.getId());
 
@@ -52,28 +61,5 @@ public class InviteConverter {
         inviteNotification.setMeeting(meetingPreview);
 
         return inviteNotification;
-    }
-
-    public InviteResponseNotification toResponseNotification(Invite source, UUID receiver, InviteStatus status) {
-
-        UUID inviteId = source.getId();
-        MeetingPreview meetingPreview = new MeetingPreview();
-        meetingPreview.setId(source.getMeetingId().getId());
-        meetingPreview.setTitle(source.getMeetingId().getTitle());
-
-        NotificationType notificationType;
-        if (status == InviteStatus.ACCEPTED) {
-            notificationType = NotificationType.ACCEPT_INVITE;
-        } else {
-            notificationType = NotificationType.DECLINE_INVITE;
-        }
-
-        return new InviteResponseNotification(
-                source.getUserId(),
-                receiver,
-                inviteId,
-                meetingPreview,
-                notificationType
-        );
     }
 }

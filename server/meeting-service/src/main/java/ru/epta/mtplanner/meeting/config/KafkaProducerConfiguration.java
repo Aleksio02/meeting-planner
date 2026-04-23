@@ -26,8 +26,7 @@ public class KafkaProducerConfiguration {
         configProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         configProperties.put(JsonSerializer.TYPE_MAPPINGS,
                 "send_invite:ru.epta.mtplanner.commons.model.notification.InviteNotification, " +
-                "meeting:ru.epta.mtplanner.commons.model.notification.MeetingNotification, " +
-                "invite_response:ru.epta.mtplanner.commons.model.notification.InviteResponseNotification");
+                "meeting:ru.epta.mtplanner.commons.model.notification.MeetingNotification");
         return new DefaultKafkaProducerFactory<>(configProperties);
     }
 

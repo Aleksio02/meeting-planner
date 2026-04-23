@@ -3,7 +3,6 @@ package ru.epta.notification.converter;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 import ru.epta.mtplanner.commons.model.notification.InviteNotification;
-import ru.epta.mtplanner.commons.model.notification.InviteResponseNotification;
 import ru.epta.mtplanner.commons.model.notification.MeetingNotification;
 import ru.epta.mtplanner.commons.model.notification.Notification;
 import ru.epta.notification.dao.dto.NotificationDto;
@@ -20,7 +19,7 @@ public class NotificationConverter {
         destination.setSentAt(source.getSentAt());
 
         switch (source.getType()) {
-            case SEND_INVITE -> {
+            case SEND_INVITE, ACCEPT_INVITE, DECLINE_INVITE -> {
                 InviteNotification inviteNotification = (InviteNotification) source;
                 destination.setMeetingId(inviteNotification.getMeeting().getId());
                 destination.setInviteId(inviteNotification.getInviteId());
@@ -28,11 +27,6 @@ public class NotificationConverter {
             case CREATE_MEETING -> {
                 MeetingNotification meetingNotification = (MeetingNotification) source;
                 destination.setMeetingId(meetingNotification.getMeeting().getId());
-            }
-            case ACCEPT_INVITE, DECLINE_INVITE -> {
-                InviteResponseNotification inviteResponseNotification = (InviteResponseNotification) source;
-                destination.setMeetingId(inviteResponseNotification.getMeeting().getId());
-                destination.setInviteId(inviteResponseNotification.getInviteId());
             }
             default -> throw new IllegalStateException("Unknown type of notification");
         }

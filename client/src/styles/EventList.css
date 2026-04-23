@@ -242,3 +242,158 @@
     font-size: 24px;
   }
 }
+.event-list {
+  position: absolute;
+  left: 620px;
+  right: 60px;
+  top: 160px;
+  bottom: 30px;
+  background-color: #4e453d;
+  border-radius: 25px;
+  padding: 40px;
+  box-sizing: border-box;
+  font-family: 'Open Sans', sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+.event-list-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.event-list-left {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.day-nav {
+  background: none; border: none; color: #fbb564;
+  font-size: 50px; cursor: pointer;
+}
+
+.event-list-left h3 {
+  color: #ffffff; font-size: 32px; font-weight: 600; margin: 0;
+}
+
+.today-button-top {
+  background-color: #3e3731; border: 2px solid #fbb564;
+  color: #fbb564; font-size: 26px; font-weight: 700;
+  cursor: pointer; width: 170px; height: 60px;
+  border-radius: 18px; transition: all 0.3s ease;
+}
+
+.events-subtitle {
+  color: #fbb564; font-size: 38px; font-weight: 900;
+  text-align: center; margin-bottom: 30px;
+}
+
+.events-container {
+  flex: 1; display: flex; flex-direction: column; gap: 20px;
+  overflow-y: auto; padding-right: 10px;
+}
+
+/* Элемент списка */
+.event-item {
+  border-top: 3px solid #ffa9487a;
+  border-bottom: 3px solid #ffa9487a;
+  padding: 25px 30px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 90px; /* Фиксируем высоту, чтобы ничего не прыгало */
+}
+
+.event-item:hover {
+  background-color: rgba(251, 181, 100, 0.05);
+  border-color: #fbb564;
+}
+
+/* --- МАГИЯ ИКОНКИ: Улучшенная версия --- */
+
+.event-edit-container {
+  width: 0;
+  opacity: 0;
+  overflow: visible; /* Разрешаем иконке выходить за рамки контейнера при скейле */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Добавляем небольшое смещение влево для эффекта "выплывания" */
+  transform: translateX(-20px); 
+  transition: 
+    width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.3s ease,
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); /* Эффект "пружины" */
+  flex-shrink: 0;
+}
+
+.pencil-btn-clean {
+  background: transparent;
+  border: none;
+  padding: 0;
+  width: 50px;  /* Размер области кнопки */
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-right: 15px; 
+  transition: transform 0.2s ease-out;
+  outline: none;
+}
+
+.pencil-btn-clean img {
+  width: 38px;  /* Иконка стала больше */
+  height: 38px;
+  display: block;
+  /* Если иконка слишком темная, можно подсветить ее: */
+  filter: drop-shadow(0 0 2px rgba(251, 181, 100, 0.2)); 
+}
+
+/* При наведении на ВСЮ строку события */
+.event-item.my-event:hover .event-edit-container {
+  width: 70px;      /* Увеличили ширину, чтобы иконке было просторно */
+  opacity: 1;
+  transform: translateX(0); /* Возвращаем в нормальное положение */
+}
+
+/* Эффект при наведении конкретно на иконку */
+.pencil-btn-clean:hover {
+  transform: scale(1.15); /* Чуть меньше, чтобы точно не вылезло, но заметно */
+}
+
+.pencil-btn-clean:active {
+  transform: scale(0.9); /* Эффект нажатия */
+}
+
+/* Текст события (плавно отъезжает) */
+.event-title {
+  color: #ffffff;
+  font-size: 26px;
+  font-weight: 600;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* Добавляем задержку на цвет, чтобы он не менялся раньше анимации */
+  transition: color 0.3s ease, margin 0.4s ease; 
+}
+
+.event-item:hover .event-title {
+  color: #fbb564;
+}
+
+/* Фикс для плавности самой строки */
+.event-item {
+  min-height: 90px;
+  display: flex;
+  align-items: center;
+  padding: 0 30px;
+  /* Убедись, что overflow на самом айтеме скрывает вылет в самом начале */
+  overflow: hidden; 
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}

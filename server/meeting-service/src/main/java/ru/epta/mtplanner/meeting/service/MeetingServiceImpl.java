@@ -13,7 +13,6 @@ import ru.epta.mtplanner.commons.dao.UserDao;
 import ru.epta.mtplanner.commons.dao.dto.UserDto;
 import ru.epta.mtplanner.commons.exception.AccessForbiddenException;
 import ru.epta.mtplanner.commons.model.User;
-import ru.epta.mtplanner.commons.model.notification.MeetingNotification;
 import ru.epta.mtplanner.commons.model.notification.MeetingPreview;
 import ru.epta.mtplanner.commons.model.notification.NotificationType;
 import ru.epta.mtplanner.meeting.converter.MeetingConverter;
@@ -34,7 +33,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Primary
 @Service
@@ -110,16 +108,7 @@ public class MeetingServiceImpl implements MeetingService {
         MeetingConverter meetingConverter = new MeetingConverter();
         meetingConverter.fromDto(savedMeeting, meeting);
 
-        MeetingPreview meetingPreview = new MeetingPreview();
-        meetingPreview.setId(meeting.getId());
-        meetingPreview.setTitle(meeting.getTitle());
-
-        User actor = new User();
-        UserConverter userConverter = new UserConverter();
-        userConverter.fromDto(owner, actor);
-
-        MeetingNotification notification = new MeetingNotification(actor, meetingPreview, NotificationType.CREATE_MEETING);
-        notificationKafkaProducer.sendNotification(notification);
+        notificationKafkaProducer.sendNotification(meetingConverter.toNotification(meeting, NotificationType.CANCEL_MEETING));
 
         return meeting;
     }

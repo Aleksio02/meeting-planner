@@ -172,8 +172,9 @@ public class MeetingServiceImpl implements MeetingService {
         }
 
         meetingDto.setStatus(MeetingStatus.CANCELED);
-        meetingDto.setCancellationReason(request.getReason());
-        meetingDto.setCancelledAt(LocalDateTime.now());
+        // TODO: Вернуть после добавления миграций
+//        meetingDto.setCancellationReason(request.getReason());
+//        meetingDto.setCancelledAt(LocalDateTime.now());
 
         MeetingDto cancelledMeeting = meetingDao.save(meetingDto);
 

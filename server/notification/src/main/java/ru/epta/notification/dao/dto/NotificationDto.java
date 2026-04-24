@@ -40,8 +40,9 @@ public class NotificationDto {
     @Enumerated(EnumType.STRING)
     private NotificationType type;
 
+    // TODO: добавить миграцию с этим полем
 //    @Column
-    private String comment;
+//    private String comment;
 
     @Column(name = "sent_at")
     private LocalDateTime sentAt;

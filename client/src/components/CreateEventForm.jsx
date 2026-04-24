@@ -3,7 +3,7 @@ import "../styles/CreateEventForm.css";
 import TimePicker from "./TimePicker";
 import DatePicker from "./DatePicker";
 
-const CreateEventForm = () => {
+const CreateEventForm = ({ onClose }) => {
   const [selectedTime, setSelectedTime] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
   const [emailInput, setEmailInput] = useState("");
@@ -12,10 +12,12 @@ const CreateEventForm = () => {
   const handleChange = (date) => {
     setSelectedDate(date);
   };
+  
   const isValidEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(email);
   };
+  
   const handleAddEmail = () => {
     const trimmed = emailInput.trim();
     if (
@@ -43,8 +45,11 @@ const CreateEventForm = () => {
   }
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        {/* КРЕСТИК ЗАКРЫТИЯ */}
+        <button className="modal-close-x" onClick={onClose}>✕</button>
+        
         <div className="input-content">
           <input
             type="text"

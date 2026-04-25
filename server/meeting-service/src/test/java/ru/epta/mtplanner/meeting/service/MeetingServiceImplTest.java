@@ -45,6 +45,9 @@ class MeetingServiceImplTest {
     @Mock
     UserDao userDao;
 
+    @Mock
+    NotificationKafkaProducer notificationKafkaProducer;
+
     @InjectMocks
     MeetingServiceImpl meetingService;
 

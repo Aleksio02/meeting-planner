@@ -1,7 +1,9 @@
 package ru.epta.mtplanner.commons.model.notification;
 
 public enum NotificationType {
-    CANCEL_MEETING,
     SEND_INVITE,
-    CREATE_MEETING
+    ACCEPT_INVITE,
+    DECLINE_INVITE,
+    CREATE_MEETING,
+    CANCEL_MEETING
 }

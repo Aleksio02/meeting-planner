@@ -35,10 +35,9 @@ public class MeetingDto extends AbstractEntityDto {
     @Column
     private MeetingStatus status;
 
-    // TODO: добавить миграцию с этими полями
-//    @Column
-//    private String cancellationReason;
+    @Column
+    private String cancellationReason;
 
-//    @Column
-//    private LocalDateTime cancelledAt;
+    @Column
+    private LocalDateTime cancelledAt;
 }

@@ -305,3 +305,21 @@ body * {
 .event-create:active {
   background-color: #f8cfa1;
 }
+
+.modal-close-x {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  color: #fbb564;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.modal-close-x:hover {
+  color: #fff;
+  transform: rotate(90deg);
+}

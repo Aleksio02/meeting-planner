@@ -46,6 +46,15 @@ body {
   outline: none;
   font-weight: 300;
   margin-bottom: 15px;
+  transition: border-color 0.3s;
+}
+
+.register-input:focus {
+  border-color: #fbb564;
+}
+
+.register-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .register-button {
@@ -62,8 +71,13 @@ body {
   margin-top: 10px;
 }
 
-.register-button:hover {
+.register-button:hover:not(:disabled) {
   background-color: #fbb564;
+}
+
+.register-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .register-footer {
@@ -87,4 +101,43 @@ body {
   font-size: 15px;
   cursor: pointer;
   user-select: none;
+}
+
+.register-footer-link:hover {
+  color: #fbb564;
+}
+/* Обёртка для инпута + подсказки */
+.input-group {
+  width: 326px;
+  position: relative;
+  margin-bottom: 5px;
+}
+
+/* Ошибка — красная обводка */
+.register-input.input-error {
+  border-color: #ff4757 !important;
+}
+
+/* Успех — зелёная обводка */
+.register-input.input-success {
+  border-color: #2ed573 !important;
+}
+
+/* Подсказка под полем */
+.field-hint {
+  color: #ff4757;
+  font-size: 12px;
+  font-weight: 500;
+  display: block;
+  text-align: left;
+  padding-left: 4px;
+  margin-top: 2px;
+  margin-bottom: 8px;
+  min-height: 16px;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
 }

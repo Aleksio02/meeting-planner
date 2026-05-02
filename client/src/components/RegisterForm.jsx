@@ -3,14 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../api/auth';
 import { useToast } from '../context/ToastContext';
 
-// Валидация одного поля
 const validateField = (name, value, formData) => {
   switch (name) {
     case 'username':
       if (!value.trim()) return 'Введите имя профиля';
       if (value.trim().length < 3) return 'Минимум 3 символа';
       if (value.trim().length > 30) return 'Максимум 30 символов';
-      // Только буквы (латиница + кириллица), цифры, пробел, _ и -
       if (!/^[a-zA-Zа-яА-ЯёЁ0-9 _\-]+$/.test(value.trim())) {
         return 'Только буквы, цифры, пробел, _ и -';
       }
@@ -91,6 +89,14 @@ const RegisterForm = () => {
   const extractErrors = (errorData) => {
     const messages = [];
 
+    if (!errorData) return ['Неизвестная ошибка сервера'];
+
+    // Формат бекенда: { errorCode: 400, errorMessage: "..." }
+    if (errorData.errorMessage) {
+      messages.push(errorData.errorMessage);
+      return messages;
+    }
+
     if (typeof errorData === 'string') {
       messages.push(errorData);
       return messages;
@@ -144,23 +150,26 @@ const RegisterForm = () => {
         password: formData.password,
       });
 
-      addToast(' Регистрация успешна! Перенаправляем...', 'success', 3000);
+      addToast('✅ Регистрация успешна! Перенаправляем...', 'success', 3000);
 
       setTimeout(() => {
         navigate('/login');
       }, 1500);
 
     } catch (error) {
-      const status = error.response?.status;
       const data = error.response?.data;
-      const errorMessages = extractErrors(data);
+      
+      // Получаем сообщение из формата бекенда
+      const errorMessage = data?.errorMessage || extractErrors(data).join('. ');
 
-      if (status === 409) {
-        addToast('Пользователь с таким именем или почтой уже существует', 'error', 6000);
+      if (errorMessage.toLowerCase().includes('username or email exists')) {
+        addToast(' Пользователь с таким именем или почтой уже существует', 'error', 6000);
+      } else if (data?.errorCode === 400 || error.response?.status === 400) {
+        addToast(` ${errorMessage}`, 'error', 6000);
       } else if (!error.response) {
         addToast(' Нет соединения с сервером', 'error', 6000);
       } else {
-        errorMessages.forEach(msg => addToast(`❌ ${msg}`, 'error', 6000));
+        addToast(` ${errorMessage}`, 'error', 6000);
       }
     } finally {
       setLoading(false);
@@ -179,7 +188,6 @@ const RegisterForm = () => {
     <form onSubmit={handleSubmit} className="register-card" noValidate>
       <h1 className="register-title">Регистрация</h1>
 
-      {/* Username */}
       <div className="input-group">
         <input
           name="username"
@@ -197,7 +205,6 @@ const RegisterForm = () => {
         )}
       </div>
 
-      {/* Email */}
       <div className="input-group">
         <input
           name="email"
@@ -215,7 +222,6 @@ const RegisterForm = () => {
         )}
       </div>
 
-      {/* Password */}
       <div className="input-group">
         <input
           name="password"
@@ -233,7 +239,6 @@ const RegisterForm = () => {
         )}
       </div>
 
-      {/* Confirm Password */}
       <div className="input-group">
         <input
           name="confirmPassword"

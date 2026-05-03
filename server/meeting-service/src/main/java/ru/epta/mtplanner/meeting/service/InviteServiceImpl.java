@@ -173,14 +173,14 @@ public class InviteServiceImpl implements InviteService {
 
     @Override
     public List<Invite> createListInvite(CreateListInviteRequest request, UUID currentUserId) {
-        List<UUID> participants = request.getUserIds();
+        List<UUID> userIds = request.getUserIds();
 
-        List<Invite> invites = new ArrayList<>();
+        List<Invite> invites = new ArrayList<>(userIds.size());
 
-        for (UUID participant : participants) {
+        for (UUID userId : userIds) {
             CreateInviteRequest inviteRequest = new CreateInviteRequest();
             inviteRequest.setMeetingId(request.getMeetingId());
-            inviteRequest.setUserId(participant);
+            inviteRequest.setUserId(userId);
             inviteRequest.setStatus(InviteStatus.PENDING);
 
             invites.add(createInvite(inviteRequest, currentUserId));

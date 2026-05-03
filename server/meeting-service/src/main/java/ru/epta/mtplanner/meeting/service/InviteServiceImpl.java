@@ -21,7 +21,7 @@ import ru.epta.mtplanner.meeting.dao.dto.MeetingDto;
 import ru.epta.mtplanner.meeting.dao.specification.InviteSpecification;
 import ru.epta.mtplanner.meeting.model.Invite;
 import ru.epta.mtplanner.meeting.model.enums.InviteStatus;
-import ru.epta.mtplanner.meeting.model.request.AddParticipantsRequest;
+import ru.epta.mtplanner.meeting.model.request.CreateListInviteRequest;
 import ru.epta.mtplanner.meeting.model.request.CreateInviteRequest;
 import ru.epta.mtplanner.meeting.model.request.GetListInviteRequest;
 
@@ -172,17 +172,8 @@ public class InviteServiceImpl implements InviteService {
     }
 
     @Override
-    public List<Invite> addParticipants(UUID id, AddParticipantsRequest request, UUID currentUserId) {
-        MeetingDto meetingDto = meetingDao.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Meeting not found with id: " + id));
-
-        UUID ownerId = meetingDto.getOwnerId().getId();
-
-        if (!currentUserId.equals(ownerId)) {
-            throw new AccessForbiddenException("You are not the owner of the meeting. Only the meeting owner can update it.");
-        }
-
-        List<UUID> participants = request.getParticipants();
+    public List<Invite> createListInvite(CreateListInviteRequest request, UUID currentUserId) {
+        List<UUID> participants = request.getUserIds();
         if (participants == null || participants.isEmpty()) {
             throw new IncorrectRequestDataException("Participants list cannot be empty");
         }
@@ -195,7 +186,7 @@ public class InviteServiceImpl implements InviteService {
             }
 
             CreateInviteRequest inviteRequest = new CreateInviteRequest();
-            inviteRequest.setMeetingId(id);
+            inviteRequest.setMeetingId(request.getMeetingId());
             inviteRequest.setUserId(participant);
             inviteRequest.setStatus(InviteStatus.PENDING);
 

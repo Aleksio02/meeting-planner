@@ -8,6 +8,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class AddParticipantsRequest {
-    private List<UUID> participants;
+public class CreateListInviteRequest {
+    private UUID meetingId;
+    private List<UUID> userIds;
 }

@@ -21,10 +21,12 @@ import ru.epta.mtplanner.meeting.dao.dto.MeetingDto;
 import ru.epta.mtplanner.meeting.dao.specification.InviteSpecification;
 import ru.epta.mtplanner.meeting.model.Invite;
 import ru.epta.mtplanner.meeting.model.enums.InviteStatus;
+import ru.epta.mtplanner.meeting.model.request.AddParticipantsRequest;
 import ru.epta.mtplanner.meeting.model.request.CreateInviteRequest;
 import ru.epta.mtplanner.meeting.model.request.GetListInviteRequest;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -40,10 +42,10 @@ public class InviteServiceImpl implements InviteService {
 
 
     public InviteServiceImpl(
-        MeetingDao meetingDao,
-        UserDao userDao,
-        InviteDao inviteDao,
-        NotificationKafkaProducer notificationKafkaProducer
+            MeetingDao meetingDao,
+            UserDao userDao,
+            InviteDao inviteDao,
+            NotificationKafkaProducer notificationKafkaProducer
     ) {
         this.meetingDao = meetingDao;
         this.userDao = userDao;
@@ -55,7 +57,7 @@ public class InviteServiceImpl implements InviteService {
     public Invite getInviteById(UUID id) {
 
         InviteDto inviteDto = inviteDao.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Invite not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Invite not found with id: " + id));
 
         Invite invite = new Invite();
         InviteConverter inviteConverter = new InviteConverter();
@@ -92,15 +94,15 @@ public class InviteServiceImpl implements InviteService {
     @Transactional
     public Invite createInvite(CreateInviteRequest request, UUID currentId) {
         MeetingDto meetingDto = meetingDao.findById(request.getMeetingId())
-            .orElseThrow(() -> new EntityNotFoundException("Meeting not found with id: " + request.getMeetingId()));
+                .orElseThrow(() -> new EntityNotFoundException("Meeting not found with id: " + request.getMeetingId()));
 
         if (!meetingDto.getOwnerId().getId().equals(currentId)) {
             throw new AccessForbiddenException(
-                "You are not the owner of this meeting. Only the meeting owner can create invites.");
+                    "You are not the owner of this meeting. Only the meeting owner can create invites.");
         }
 
         UserDto userDto = userDao.findById(request.getUserId())
-            .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + request.getUserId()));
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + request.getUserId()));
 
         if (userDto.getId().equals(currentId)) {
             throw new IncorrectRequestDataException("You are owner of this meeting.");
@@ -167,5 +169,39 @@ public class InviteServiceImpl implements InviteService {
         notificationKafkaProducer.sendNotification(inviteConverter.toNotification(invite, notificationType));
 
         return invite;
+    }
+
+    @Override
+    public List<Invite> addParticipants(UUID id, AddParticipantsRequest request, UUID currentUserId) {
+        MeetingDto meetingDto = meetingDao.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Meeting not found with id: " + id));
+
+        UUID ownerId = meetingDto.getOwnerId().getId();
+
+        if (!currentUserId.equals(ownerId)) {
+            throw new AccessForbiddenException("You are not the owner of the meeting. Only the meeting owner can update it.");
+        }
+
+        List<UUID> participants = request.getParticipants();
+        if (participants == null || participants.isEmpty()) {
+            throw new IncorrectRequestDataException("Participants list cannot be empty");
+        }
+
+        List<Invite> invites = new ArrayList<>();
+
+        for (UUID participant : participants) {
+            if (participant == null) {
+                throw new IncorrectRequestDataException("User ID cannot be null");
+            }
+
+            CreateInviteRequest inviteRequest = new CreateInviteRequest();
+            inviteRequest.setMeetingId(id);
+            inviteRequest.setUserId(participant);
+            inviteRequest.setStatus(InviteStatus.PENDING);
+
+            invites.add(createInvite(inviteRequest, currentUserId));
+        }
+
+        return invites;
     }
 }

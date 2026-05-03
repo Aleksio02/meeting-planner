@@ -2,7 +2,10 @@ package ru.epta.mtplanner.meeting.service;
 
 import org.springframework.stereotype.Service;
 import ru.epta.mtplanner.meeting.model.Meeting;
-import ru.epta.mtplanner.meeting.model.request.*;
+import ru.epta.mtplanner.meeting.model.request.CancelMeetingRequest;
+import ru.epta.mtplanner.meeting.model.request.CreateMeetingRequest;
+import ru.epta.mtplanner.meeting.model.request.GetListMeetingRequest;
+import ru.epta.mtplanner.meeting.model.request.UpdateMeetingRequest;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,7 +23,4 @@ public interface MeetingService {
     Meeting updateMeeting(UUID id, UpdateMeetingRequest request, UUID currentUserId);
 
     Meeting cancelMeeting(UUID id, CancelMeetingRequest request, UUID currentUserId);
-
-    Meeting addParticipants(UUID id, AddParticipantsRequest request, UUID currentUserId);
-
 }

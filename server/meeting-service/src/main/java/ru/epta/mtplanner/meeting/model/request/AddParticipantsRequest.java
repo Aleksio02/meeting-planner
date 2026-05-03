@@ -2,12 +2,12 @@ package ru.epta.mtplanner.meeting.model.request;
 
 import lombok.Getter;
 import lombok.Setter;
-import ru.epta.mtplanner.commons.model.User;
 
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
 public class AddParticipantsRequest {
-    private List<User> participants;
+    private List<UUID> participants;
 }

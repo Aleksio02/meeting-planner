@@ -8,17 +8,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.epta.mtplanner.commons.converter.UserConverter;
 import ru.epta.mtplanner.commons.dao.UserDao;
 import ru.epta.mtplanner.commons.dao.dto.UserDto;
 import ru.epta.mtplanner.commons.exception.AccessForbiddenException;
 import ru.epta.mtplanner.commons.model.User;
-import ru.epta.mtplanner.commons.model.notification.MeetingPreview;
-import ru.epta.mtplanner.commons.model.notification.NotificationType;
-import ru.epta.mtplanner.commons.model.User;
-import ru.epta.mtplanner.commons.model.notification.MeetingNotification;
-import ru.epta.mtplanner.commons.model.notification.MeetingPreview;
-import ru.epta.mtplanner.commons.model.notification.Notification;
 import ru.epta.mtplanner.commons.model.notification.NotificationType;
 import ru.epta.mtplanner.meeting.converter.MeetingConverter;
 import ru.epta.mtplanner.meeting.dao.InviteDao;
@@ -29,10 +22,7 @@ import ru.epta.mtplanner.meeting.dao.specification.MeetingSpecification;
 import ru.epta.mtplanner.meeting.model.Meeting;
 import ru.epta.mtplanner.meeting.model.enums.InviteStatus;
 import ru.epta.mtplanner.meeting.model.enums.MeetingStatus;
-import ru.epta.mtplanner.meeting.model.request.CancelMeetingRequest;
-import ru.epta.mtplanner.meeting.model.request.CreateMeetingRequest;
-import ru.epta.mtplanner.meeting.model.request.GetListMeetingRequest;
-import ru.epta.mtplanner.meeting.model.request.UpdateMeetingRequest;
+import ru.epta.mtplanner.meeting.model.request.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -49,11 +39,14 @@ public class MeetingServiceImpl implements MeetingService {
     private final UserDao userDao;
     private final NotificationKafkaProducer notificationKafkaProducer;
 
-    public MeetingServiceImpl(MeetingDao meetingDao, InviteDao inviteDao, UserDao userDao, NotificationKafkaProducer notificationKafkaProducer) {
+    private final InviteService inviteService;
+
+    public MeetingServiceImpl(MeetingDao meetingDao, InviteDao inviteDao, UserDao userDao, NotificationKafkaProducer notificationKafkaProducer, InviteService inviteService) {
         this.meetingDao = meetingDao;
         this.inviteDao = inviteDao;
         this.userDao = userDao;
         this.notificationKafkaProducer = notificationKafkaProducer;
+        this.inviteService = inviteService;
     }
 
     @Override
@@ -196,4 +189,39 @@ public class MeetingServiceImpl implements MeetingService {
         return meeting;
     }
 
+    @Override
+    public Meeting addParticipants(UUID id, AddParticipantsRequest request, UUID currentUserId) {
+        MeetingDto meetingDto = meetingDao.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Meeting not found with id: " + id));
+
+        UUID ownerId = meetingDto.getOwnerId().getId();
+
+        if (!currentUserId.equals(ownerId)) {
+            throw new AccessForbiddenException("You are not the owner of the meeting. Only the meeting owner can update it.");
+        }
+
+        List<User> participants = request.getParticipants();
+        if (participants == null || participants.isEmpty()) {
+            throw new IllegalArgumentException("Participants list cannot be empty");
+        }
+
+        for (User participant : participants) {
+            if (participant.getId() == null) {
+                throw new IllegalArgumentException("User ID cannot be null");
+            }
+
+            CreateInviteRequest inviteRequest = new CreateInviteRequest();
+            inviteRequest.setMeetingId(id);
+            inviteRequest.setUserId(participant.getId());
+            inviteRequest.setStatus(InviteStatus.PENDING);
+
+            inviteService.createInvite(inviteRequest, currentUserId);
+        }
+
+        Meeting meeting = new Meeting();
+        MeetingConverter meetingConverter = new MeetingConverter();
+        meetingConverter.fromDto(meetingDto, meeting);
+
+        return meeting;
+    }
 }

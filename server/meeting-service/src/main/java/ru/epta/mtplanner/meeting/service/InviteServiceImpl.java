@@ -174,17 +174,10 @@ public class InviteServiceImpl implements InviteService {
     @Override
     public List<Invite> createListInvite(CreateListInviteRequest request, UUID currentUserId) {
         List<UUID> participants = request.getUserIds();
-        if (participants == null || participants.isEmpty()) {
-            throw new IncorrectRequestDataException("Participants list cannot be empty");
-        }
 
         List<Invite> invites = new ArrayList<>();
 
         for (UUID participant : participants) {
-            if (participant == null) {
-                throw new IncorrectRequestDataException("User ID cannot be null");
-            }
-
             CreateInviteRequest inviteRequest = new CreateInviteRequest();
             inviteRequest.setMeetingId(request.getMeetingId());
             inviteRequest.setUserId(participant);

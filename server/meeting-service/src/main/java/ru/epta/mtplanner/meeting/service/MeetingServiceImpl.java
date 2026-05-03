@@ -8,9 +8,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.epta.mtplanner.commons.converter.UserConverter;
 import ru.epta.mtplanner.commons.dao.UserDao;
 import ru.epta.mtplanner.commons.dao.dto.UserDto;
 import ru.epta.mtplanner.commons.exception.AccessForbiddenException;
+import ru.epta.mtplanner.commons.model.User;
+import ru.epta.mtplanner.commons.model.notification.MeetingPreview;
+import ru.epta.mtplanner.commons.model.notification.NotificationType;
+import ru.epta.mtplanner.commons.model.User;
+import ru.epta.mtplanner.commons.model.notification.MeetingNotification;
+import ru.epta.mtplanner.commons.model.notification.MeetingPreview;
+import ru.epta.mtplanner.commons.model.notification.Notification;
 import ru.epta.mtplanner.commons.model.notification.NotificationType;
 import ru.epta.mtplanner.meeting.converter.MeetingConverter;
 import ru.epta.mtplanner.meeting.dao.InviteDao;
@@ -41,14 +49,11 @@ public class MeetingServiceImpl implements MeetingService {
     private final UserDao userDao;
     private final NotificationKafkaProducer notificationKafkaProducer;
 
-    private final InviteService inviteService;
-
-    public MeetingServiceImpl(MeetingDao meetingDao, InviteDao inviteDao, UserDao userDao, NotificationKafkaProducer notificationKafkaProducer, InviteService inviteService) {
+    public MeetingServiceImpl(MeetingDao meetingDao, InviteDao inviteDao, UserDao userDao, NotificationKafkaProducer notificationKafkaProducer) {
         this.meetingDao = meetingDao;
         this.inviteDao = inviteDao;
         this.userDao = userDao;
         this.notificationKafkaProducer = notificationKafkaProducer;
-        this.inviteService = inviteService;
     }
 
     @Override
@@ -86,6 +91,7 @@ public class MeetingServiceImpl implements MeetingService {
 
         return meetings;
     }
+
 
     @Override
     @Transactional
@@ -181,6 +187,7 @@ public class MeetingServiceImpl implements MeetingService {
         MeetingConverter meetingConverter = new MeetingConverter();
         meetingConverter.fromDto(cancelledMeeting, meeting);
 
+
         List<InviteDto> participants = inviteDao.findAllByMeetingIdAndStatus(meetingDto.getId(), InviteStatus.ACCEPTED);
         List<UUID> participantIds = participants.stream()
                 .map(inv -> inv.getUser().getId())
@@ -190,4 +197,5 @@ public class MeetingServiceImpl implements MeetingService {
 
         return meeting;
     }
+
 }

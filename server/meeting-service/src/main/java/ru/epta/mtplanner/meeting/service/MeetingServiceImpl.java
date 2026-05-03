@@ -92,6 +92,7 @@ public class MeetingServiceImpl implements MeetingService {
         return meetings;
     }
 
+
     @Override
     @Transactional
     public Meeting createMeeting(CreateMeetingRequest request, UUID currentId) {
@@ -185,6 +186,7 @@ public class MeetingServiceImpl implements MeetingService {
         Meeting meeting = new Meeting();
         MeetingConverter meetingConverter = new MeetingConverter();
         meetingConverter.fromDto(cancelledMeeting, meeting);
+
 
         List<InviteDto> participants = inviteDao.findAllByMeetingIdAndStatus(meetingDto.getId(), InviteStatus.ACCEPTED);
         List<UUID> participantIds = participants.stream()

@@ -5,9 +5,6 @@
   font-family: 'Open Sans', sans-serif;
   position: relative;
   padding-top: 30px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  box-sizing: border-box;
 }
 
 /* ===== ДЕСКТОП ===== */
@@ -37,168 +34,14 @@
   left: 60px;
   top: 295px;
   width: 500px;
-  /* Убрали фиксированную высоту и overflow: hidden */
+  height: 520px;
 }
 
 .calendar-wrapper .calendar {
   width: 100%;
+  height: 100%;
   padding: 0px;
   box-sizing: border-box;
-}
-
-/* ===== Event List ===== */
-.event-list {
-  position: absolute;
-  left: 620px;
-  right: 60px;
-  top: 170px;
-  bottom: 45px;
-  background-color: #4e453d;
-  border-radius: 25px;
-  padding: 35px 30px 30px 30px;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
-
-.event-list-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-.event-list-left {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.day-nav {
-  background: none;
-  border: none;
-  color: #fbb564;
-  font-size: 40px;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.day-nav:hover {
-  transform: scale(1.2);
-  color: #fff;
-}
-
-.event-list-left h3 {
-  color: #ffffff;
-  font-size: 28px;
-  margin: 0;
-}
-
-.today-button-top {
-  background-color: #3e3731;
-  border: 2px solid #fbb564;
-  color: #fbb564;
-  padding: 8px 25px;
-  border-radius: 15px;
-  font-weight: 700;
-  font-size: 18px;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.today-button-top:hover {
-  background-color: #fbb564;
-  color: #3e3731;
-}
-
-.events-subtitle {
-  color: #fbb564;
-  font-size: 30px;
-  font-weight: 900;
-  margin: 0 0 20px 0;
-  text-align: center;
-}
-
-.events-container {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-/* СТИЛИ ПЛАШКИ СОБЫТИЯ */
-.event-item {
-  border-top: 3px solid rgba(255, 169, 72, 0.3);
-  border-bottom: 3px solid rgba(255, 169, 72, 0.3);
-  padding: 20px 25px;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.event-item:hover {
-  background-color: rgba(251, 181, 100, 0.08);
-  border-color: #fbb564;
-  padding-left: 30px;
-}
-
-/* МАГИЯ ВЫПЛЫВАЮЩЕЙ ИКОНКИ */
-.event-edit-wrapper {
-  width: 0;
-  opacity: 0;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.event-item:hover .event-edit-wrapper {
-  width: 50px;
-  opacity: 1;
-}
-
-.pencil-btn-clean {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 50%;
-  display: flex;
-  transition: background 0.2s;
-}
-
-.pencil-btn-clean:hover {
-  background: rgba(251, 181, 100, 0.2);
-}
-
-.pencil-btn-clean img {
-  width: 28px;
-  height: 28px;
-  filter: invert(82%) sepia(54%) saturate(632%) hue-rotate(325deg) brightness(103%) contrast(98%);
-}
-
-.event-title {
-  color: #fff;
-  font-size: 24px;
-  font-weight: 600;
-  flex: 1;
-}
-
-.event-time {
-  color: #fbb564;
-  font-size: 20px;
-  font-weight: 500;
-}
-
-/* Кастомный скроллбар */
-.events-container::-webkit-scrollbar {
-  width: 6px;
-}
-.events-container::-webkit-scrollbar-thumb {
-  background: #fbb564;
-  border-radius: 10px;
 }
 
 /* ===== НОУТБУКИ ===== */
@@ -208,108 +51,36 @@
     width: 400px;
     height: 100px;
     font-size: 42px;
-    top: 140px;
   }
 
   .calendar-wrapper {
     left: 60px;
-    width: 400px;
-    top: 260px;
-  }
-
-  .event-list {
-    left: 500px;
-    right: 40px;
-    top: 140px;
-    bottom: 20px;
-    padding: 25px 20px 20px 20px;
-  }
-
-  .event-list-left h3 {
-    font-size: 24px;
-  }
-
-  .day-nav {
-    font-size: 35px;
-  }
-
-  .events-subtitle {
-    font-size: 26px;
-    margin-bottom: 15px;
-  }
-
-  .event-item {
-    padding: 15px 20px;
-  }
-
-  .event-title {
-    font-size: 20px;
-  }
-
-  .event-time {
-    font-size: 18px;
+    width: 450px;
+    height: 480px;
   }
 }
 
 /* ===== ПЛАНШЕТЫ ===== */
 @media (max-width: 1024px) {
   .create-button {
-    left: 40px;
-    width: 300px;
-    height: 80px;
-    font-size: 32px;
-    top: 140px;
+    left: 60px;
+    width: 350px;
+    height: 90px;
+    font-size: 36px;
+    top: 150px;
   }
 
   .calendar-wrapper {
-    left: 40px;
-    width: 300px;
-    top: 240px;
-  }
-
-  .event-list {
-    left: 370px;
-    right: 20px;
-    top: 140px;
-    bottom: 20px;
-    padding: 20px 15px 15px 15px;
-  }
-
-  .event-list-left h3 {
-    font-size: 20px;
-  }
-
-  .day-nav {
-    font-size: 30px;
-  }
-
-  .today-button-top {
-    padding: 6px 20px;
-    font-size: 16px;
-  }
-
-  .events-subtitle {
-    font-size: 22px;
-    margin-bottom: 10px;
-  }
-
-  .event-item {
-    padding: 12px 15px;
-  }
-
-  .event-title {
-    font-size: 18px;
-  }
-
-  .event-time {
-    font-size: 16px;
+    left: 60px;
+    width: 400px;
+    height: 440px;
+    top: 270px;
   }
 }
 
 /* ===== ТЕЛЕФОНЫ ===== */
 @media (max-width: 768px) {
   .home-page {
-    min-height: 100vh;
     display: flex;
     flex-direction: column;
     padding-top: 20px;
@@ -336,43 +107,6 @@
     min-height: 450px;
     margin: 0 auto;
   }
-
-  .event-list {
-    position: relative;
-    left: auto;
-    right: auto;
-    top: auto;
-    bottom: auto;
-    width: 90%;
-    max-width: 500px;
-    min-height: 400px;
-    margin: 30px auto;
-    padding: 25px 20px;
-  }
-
-  .event-list-left h3 {
-    font-size: 22px;
-  }
-
-  .day-nav {
-    font-size: 32px;
-  }
-
-  .events-subtitle {
-    font-size: 24px;
-  }
-
-  .event-item {
-    padding: 15px 20px;
-  }
-
-  .event-title {
-    font-size: 20px;
-  }
-
-  .event-time {
-    font-size: 18px;
-  }
 }
 
 /* ===== МАЛЕНЬКИЕ ТЕЛЕФОНЫ ===== */
@@ -385,51 +119,5 @@
 
   .calendar-wrapper .calendar {
     padding: 15px;
-  }
-
-  .event-list-left {
-    gap: 10px;
-  }
-
-  .event-list-left h3 {
-    font-size: 18px;
-  }
-
-  .day-nav {
-    font-size: 28px;
-  }
-
-  .today-button-top {
-    padding: 5px 15px;
-    font-size: 14px;
-  }
-
-  .events-subtitle {
-    font-size: 20px;
-  }
-
-  .event-item {
-    padding: 10px 15px;
-  }
-
-  .event-item:hover {
-    padding-left: 18px;
-  }
-
-  .event-item:hover .event-edit-wrapper {
-    width: 40px;
-  }
-
-  .pencil-btn-clean img {
-    width: 24px;
-    height: 24px;
-  }
-
-  .event-title {
-    font-size: 16px;
-  }
-
-  .event-time {
-    font-size: 14px;
   }
 }

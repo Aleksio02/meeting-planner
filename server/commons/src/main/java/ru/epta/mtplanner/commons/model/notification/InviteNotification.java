@@ -16,7 +16,7 @@ public class InviteNotification extends Notification {
     public InviteNotification() {
         super();
     }
-
+    
     public InviteNotification(User actor, UUID receiver, NotificationType type) {
         super(actor, type);
         this.receiver = receiver;

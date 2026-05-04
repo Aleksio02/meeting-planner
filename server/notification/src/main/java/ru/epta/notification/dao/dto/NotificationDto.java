@@ -40,9 +40,7 @@ public class NotificationDto {
     @Enumerated(EnumType.STRING)
     private NotificationType type;
 
-    @Column
-    private String comment;
-
     @Column(name = "sent_at")
     private LocalDateTime sentAt;
+
 }

@@ -34,10 +34,4 @@ public class MeetingDto extends AbstractEntityDto {
     @Enumerated(EnumType.STRING)
     @Column
     private MeetingStatus status;
-
-    @Column
-    private String cancellationReason;
-
-    @Column
-    private LocalDateTime cancelledAt;
 }

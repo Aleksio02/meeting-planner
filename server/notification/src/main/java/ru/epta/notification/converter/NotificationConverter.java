@@ -24,10 +24,9 @@ public class NotificationConverter {
                 destination.setMeetingId(inviteNotification.getMeeting().getId());
                 destination.setInviteId(inviteNotification.getInviteId());
             }
-            case CREATE_MEETING, CANCEL_MEETING -> {
+            case CREATE_MEETING -> {
                 MeetingNotification meetingNotification = (MeetingNotification) source;
                 destination.setMeetingId(meetingNotification.getMeeting().getId());
-                destination.setComment(meetingNotification.getComment());
             }
             default -> throw new IllegalStateException("Unknown type of notification");
         }

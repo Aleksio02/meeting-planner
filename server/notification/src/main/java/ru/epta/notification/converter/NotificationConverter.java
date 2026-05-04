@@ -19,7 +19,7 @@ public class NotificationConverter {
         destination.setSentAt(source.getSentAt());
 
         switch (source.getType()) {
-            case SEND_INVITE, ACCEPT_INVITE, DECLINE_INVITE -> {
+            case SEND_INVITE -> {
                 InviteNotification inviteNotification = (InviteNotification) source;
                 destination.setMeetingId(inviteNotification.getMeeting().getId());
                 destination.setInviteId(inviteNotification.getInviteId());

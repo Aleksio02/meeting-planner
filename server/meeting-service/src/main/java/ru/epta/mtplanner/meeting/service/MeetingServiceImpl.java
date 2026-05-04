@@ -37,7 +37,6 @@ import ru.epta.mtplanner.meeting.model.request.UpdateMeetingRequest;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -115,7 +114,7 @@ public class MeetingServiceImpl implements MeetingService {
         MeetingConverter meetingConverter = new MeetingConverter();
         meetingConverter.fromDto(savedMeeting, meeting);
 
-        notificationKafkaProducer.sendNotification(meetingConverter.toNotification(meeting, NotificationType.CANCEL_MEETING));
+        notificationKafkaProducer.sendNotification(meetingConverter.toNotification(meeting, NotificationType.CREATE_MEETING));
 
         return meeting;
     }
@@ -184,13 +183,12 @@ public class MeetingServiceImpl implements MeetingService {
         meetingConverter.fromDto(savedMeeting, meeting);
 
         List<InviteDto> participants = inviteDao.findAllByMeetingIdAndStatus(meetingDto.getId(), InviteStatus.ACCEPTED);
-        List<UUID> participantIds = participants.stream()
-                .map(inv -> inv.getUser().getId())
-                .toList();
 
-        List<UUID> receivers = new ArrayList<>();
-        receivers.add(meetingDto.getOwnerId().getId());
-        receivers.addAll(participantIds);
+        List<UUID> receivers = new ArrayList<>(participants.size());
+        participants.stream()
+                .map(inv -> inv.getUser().getId())
+                .forEach(receivers::add);
+
 
         if (isDetailsChanged[0]) {
             notificationKafkaProducer.sendNotification(meetingConverter.toNotification(meeting, NotificationType.UPDATE_MEETING_DETAILS, null, receivers));

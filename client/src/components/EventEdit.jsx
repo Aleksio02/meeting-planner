@@ -7,16 +7,8 @@ const EventEdit = ({ isOpen, onClose, eventData, onSave }) => {
   });
 
   useEffect(() => {
-    if (isOpen) {
-      if (eventData) {
-        // Редактирование — заполняем данными
-        setFormData({ ...eventData });
-      } else {
-        // Создание — очищаем поля
-        setFormData({
-          title: '', date: '', startTime: '', endTime: '', description: ''
-        });
-      }
+    if (isOpen && eventData) {
+      setFormData({ ...eventData });
     }
   }, [isOpen, eventData]);
 
@@ -33,70 +25,36 @@ const EventEdit = ({ isOpen, onClose, eventData, onSave }) => {
       <div className="edit-modal">
         <button className="edit-close-x" onClick={onClose}>✕</button>
         <form className="edit-form" onSubmit={(e) => { e.preventDefault(); onSave(formData); }}>
-          <h2 className="edit-header">
-            {eventData ? 'Редактирование' : 'Новое событие'}
-          </h2>
+          <h2 className="edit-header">Редактирование</h2>
 
           <div className="edit-group">
             <label>Название события</label>
-            <input 
-              name="title" 
-              value={formData.title} 
-              onChange={handleChange} 
-              className="edit-input" 
-              placeholder="Введите название"
-            />
+            <input name="title" value={formData.title} onChange={handleChange} className="edit-input" />
           </div>
 
           <div className="edit-row">
             <div className="edit-group">
               <label>Дата</label>
-              <input 
-                type="date" 
-                name="date" 
-                value={formData.date} 
-                onChange={handleChange} 
-                className="edit-input" 
-              />
+              <input type="date" name="date" value={formData.date} onChange={handleChange} className="edit-input" />
             </div>
             <div className="edit-group">
               <label>Начало</label>
-              <input 
-                type="time" 
-                name="startTime" 
-                value={formData.startTime} 
-                onChange={handleChange} 
-                className="edit-input" 
-              />
+              <input type="time" name="startTime" value={formData.startTime} onChange={handleChange} className="edit-input" />
             </div>
             <div className="edit-group">
               <label>Конец</label>
-              <input 
-                type="time" 
-                name="endTime" 
-                value={formData.endTime} 
-                onChange={handleChange} 
-                className="edit-input" 
-              />
+              <input type="time" name="endTime" value={formData.endTime} onChange={handleChange} className="edit-input" />
             </div>
           </div>
 
           <div className="edit-group">
             <label>Описание</label>
-            <textarea 
-              name="description" 
-              value={formData.description} 
-              onChange={handleChange} 
-              className="edit-input edit-textarea" 
-              placeholder="Добавьте описание события"
-            />
+            <textarea name="description" value={formData.description} onChange={handleChange} className="edit-input edit-textarea" />
           </div>
 
           <div className="edit-footer">
             <button type="button" className="edit-btn-secondary" onClick={onClose}>Отмена</button>
-            <button type="submit" className="edit-btn-primary">
-              {eventData ? 'Сохранить' : 'Создать'}
-            </button>
+            <button type="submit" className="edit-btn-primary">Сохранить</button>
           </div>
         </form>
       </div>

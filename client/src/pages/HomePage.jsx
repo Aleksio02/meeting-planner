@@ -3,11 +3,11 @@ import Header from "../components/Header";
 import Calendar from "../components/Calendar";
 import EventList from "../components/EventList";
 import EventEdit from "../components/EventEdit";
-import EventView from "../components/EventView";
-import CreateEventForm from "../components/CreateEventForm";
+import EventView from "../components/EventView"; // Предполагаем, что он есть
 import "../styles/HomePage.css";
 
 const HomePage = () => {
+  // Главный стейт с данными
   const [events, setEvents] = useState([
     { id: 1, title: "СОЗВОН (Моё)", date: "2025-07-07", startTime: "19:00", endTime: "20:30", description: "Обсуждение архитектуры", isMyEvent: true },
     { id: 2, title: "ОБЩАЯ ВСТРЕЧА", date: "2025-07-07", startTime: "20:00", endTime: "21:00", description: "Планерка", isMyEvent: false },
@@ -16,94 +16,54 @@ const HomePage = () => {
 
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isViewOpen, setIsViewOpen] = useState(false);
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState(null);
 
+  // Находим объект выбранного события
   const currentEvent = events.find(ev => ev.id === selectedEventId);
 
-  // Открыть форму создания
-  const handleCreateClick = () => {
-    setIsCreateOpen(true);
-  };
-
-  // Закрыть форму создания
-  const handleCloseCreate = () => {
-    setIsCreateOpen(false);
-  };
-
-  // Открыть редактирование
   const handleEditClick = (id) => {
     setSelectedEventId(id);
     setIsEditOpen(true);
   };
 
-  // Клик по событию — просмотр
   const handleEventClick = (id) => {
     setSelectedEventId(id);
     setIsViewOpen(true);
   };
 
-  // Сохранение при редактировании
-  const handleSaveEdit = (eventData) => {
-    setEvents(prev => prev.map(ev => (ev.id === eventData.id ? eventData : ev)));
+  // Функция сохранения изменений
+  const handleSaveEdit = (updatedData) => {
+    setEvents(prev => prev.map(ev => (ev.id === updatedData.id ? updatedData : ev)));
     setIsEditOpen(false);
-    setSelectedEventId(null);
-  };
-
-  // Закрытие модалки редактирования
-  const handleCloseEdit = () => {
-    setIsEditOpen(false);
-    setSelectedEventId(null);
-  };
-
-  // Закрытие просмотра
-  const handleCloseView = () => {
-    setIsViewOpen(false);
     setSelectedEventId(null);
   };
 
   return (
     <div className="home-page">
       <Header />
-      
-      {/* Кнопка создания */}
-      <button className="create-button" onClick={handleCreateClick}>
-        + Создать событие
-      </button>
-
-      {/* Календарь */}
       <div className="calendar-wrapper">
         <Calendar onDateSelect={(date) => console.log(date)} />
       </div>
 
-      {/* Список событий */}
       <EventList 
         events={events} 
         onEventClick={handleEventClick} 
         onEditClick={handleEditClick} 
       />
 
-      {/* Форма создания события */}
-      {isCreateOpen && <CreateEventForm onClose={handleCloseCreate} />}
-
-      {/* Модалка редактирования */}
-      {isEditOpen && (
-        <EventEdit 
-          isOpen={isEditOpen} 
-          onClose={handleCloseEdit} 
-          eventData={currentEvent}
-          onSave={handleSaveEdit} 
-        />
-      )}
+      <EventEdit 
+        isOpen={isEditOpen} 
+        onClose={() => setIsEditOpen(false)} 
+        eventData={currentEvent} 
+        onSave={handleSaveEdit} 
+      />
       
-      {/* Просмотр события */}
-      {isViewOpen && (
-        <EventView 
-          isOpen={isViewOpen} 
-          onClose={handleCloseView} 
-          event={currentEvent} 
-        />
-      )}
+      {/* EventView если нужен */}
+      <EventView 
+        isOpen={isViewOpen} 
+        onClose={() => setIsViewOpen(false)} 
+        event={currentEvent} 
+      />
     </div>
   );
 };

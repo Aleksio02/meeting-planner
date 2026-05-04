@@ -33,13 +33,6 @@ body {
   user-select: none;
 }
 
-/* Обёртка для инпута + подсказки */
-.input-group {
-  width: 326px;
-  position: relative;
-  margin-bottom: 5px;
-}
-
 .login-input {
   width: 326px;
   height: 48px;
@@ -53,40 +46,7 @@ body {
   outline: none;
   font-weight: 300;
   margin-bottom: 15px;
-  transition: border-color 0.3s;
 }
-
-.login-input:focus {
-  border-color: #fbb564;
-}
-
-.login-input.input-error {
-  border-color: #ff4757 !important;
-}
-
-.login-input.input-success {
-  border-color: #2ed573 !important;
-}
-
-/* Подсказка под полем */
-.field-hint {
-  color: #ff4757;
-  font-size: 12px;
-  font-weight: 500;
-  display: block;
-  text-align: left;
-  padding-left: 4px;
-  margin-top: -10px;
-  margin-bottom: 12px;
-  min-height: 16px;
-  animation: fadeIn 0.2s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
 .login-button {
   width: 326px;
   height: 48px;
@@ -100,14 +60,8 @@ body {
   transition: background-color 0.3s ease;
   margin-top: 10px;
 }
-
-.login-button:hover:not(:disabled) {
+.login-button:hover {
   background-color: #fbb564;
-}
-
-.login-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
 }
 
 .login-footer {
@@ -131,8 +85,4 @@ body {
   font-size: 15px;
   cursor: pointer;
   user-select: none;
-}
-
-.login-footer-link:hover {
-  color: #fbb564;
 }

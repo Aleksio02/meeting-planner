@@ -12,6 +12,7 @@ import ru.epta.mtplanner.commons.converter.UserConverter;
 import ru.epta.mtplanner.commons.dao.UserDao;
 import ru.epta.mtplanner.commons.dao.dto.UserDto;
 import ru.epta.mtplanner.commons.exception.AccessForbiddenException;
+import ru.epta.mtplanner.commons.exception.IncorrectRequestDataException;
 import ru.epta.mtplanner.commons.model.User;
 import ru.epta.mtplanner.commons.model.notification.MeetingPreview;
 import ru.epta.mtplanner.commons.model.notification.NotificationType;
@@ -36,6 +37,7 @@ import ru.epta.mtplanner.meeting.model.request.UpdateMeetingRequest;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -145,17 +147,58 @@ public class MeetingServiceImpl implements MeetingService {
             throw new AccessForbiddenException("You are not the owner of the meeting. Only the meeting owner can update it.");
         }
 
-        request.getTitle().ifPresent(title -> meetingDto.setTitle(title));
-        request.getDescription().ifPresent(description -> meetingDto.setDescription(description));
-        request.getStartsAt().ifPresent(startsAt -> meetingDto.setStartsAt(startsAt));
-        request.getDuration().ifPresent(duration -> meetingDto.setDuration(duration));
+        final boolean[] isDetailsChanged = {false};
+        final boolean[] isStartDateChanged = {false};
+
+        request.getStartsAt().ifPresent(startsAt -> {
+            meetingDto.setStartsAt(startsAt);
+            isStartDateChanged[0] = true;
+
+        });
+
+        request.getTitle().ifPresent(title -> {
+            meetingDto.setTitle(title);
+            isDetailsChanged[0] = true;
+        });
+
+        request.getDescription().ifPresent(description -> {
+            meetingDto.setDescription(description);
+            isDetailsChanged[0] = true;
+        });
+
+        request.getDuration().ifPresent(duration -> {
+            meetingDto.setDuration(duration);
+            isDetailsChanged[0] = true;
+        });
+
         request.getStatus().ifPresent(status -> meetingDto.setStatus(status));
+
+        if (!isDetailsChanged[0] && !isStartDateChanged[0]) {
+            throw new IncorrectRequestDataException("No changes detected");
+        }
 
         MeetingDto savedMeeting = meetingDao.save(meetingDto);
 
         Meeting meeting = new Meeting();
         MeetingConverter meetingConverter = new MeetingConverter();
         meetingConverter.fromDto(savedMeeting, meeting);
+
+        List<InviteDto> participants = inviteDao.findAllByMeetingIdAndStatus(meetingDto.getId(), InviteStatus.ACCEPTED);
+        List<UUID> participantIds = participants.stream()
+                .map(inv -> inv.getUser().getId())
+                .toList();
+
+        List<UUID> receivers = new ArrayList<>();
+        receivers.add(meetingDto.getOwnerId().getId());
+        receivers.addAll(participantIds);
+
+        if (isDetailsChanged[0]) {
+            notificationKafkaProducer.sendNotification(meetingConverter.toNotification(meeting, NotificationType.UPDATE_MEETING_DETAILS, null, receivers));
+        }
+
+        if (isStartDateChanged[0]) {
+            notificationKafkaProducer.sendNotification(meetingConverter.toNotification(meeting, NotificationType.RESCHEDULE_MEETING, null, receivers));
+        }
 
         return meeting;
     }

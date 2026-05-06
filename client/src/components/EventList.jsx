@@ -1,62 +1,96 @@
+// src/components/EventList.jsx
 import React, { useState } from 'react';
 import '../styles/EventList.css';
 
-const EventList = ({ events = [], selectedDate, onEventClick, onEditClick, onDateChange }) => {
-  const [currentDate, setCurrentDate] = useState(selectedDate || new Date(2025, 6, 7));
+const EventList = ({ selectedDate, onDateChange, onEventClick }) => {
+  const [currentDate, setCurrentDate] = useState(selectedDate || new Date(2025, 6, 3));
 
   const formatDate = (date) => {
     const days = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
-    return `${days[date.getDay()]} ${day}.${month}.${date.getFullYear()}`;
+    const year = date.getFullYear();
+    return `${days[date.getDay()]} ${day}.${month}.${year}`;
   };
 
-  const changeDay = (offset) => {
+  const handlePrevDay = () => {
     const newDate = new Date(currentDate);
-    newDate.setDate(currentDate.getDate() + offset);
+    newDate.setDate(currentDate.getDate() - 1);
     setCurrentDate(newDate);
     if (onDateChange) onDateChange(newDate);
   };
 
+  const handleNextDay = () => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(currentDate.getDate() + 1);
+    setCurrentDate(newDate);
+    if (onDateChange) onDateChange(newDate);
+  };
+
+  const handleToday = () => {
+    const today = new Date();
+    setCurrentDate(today);
+    if (onDateChange) onDateChange(today);
+  };
+
+   // Обработчик клика по событию
+  const handleEventItemClick = (event) => {
+    console.log('Клик по событию:', event);
+    if (onEventClick) {
+      onEventClick(event.id); // Передаём ID события наверх
+    }
+  };
+
+  const events = [
+    {
+      id: 1,
+      title: "СОЗВОН",
+      time: "19:00",
+      date: "07.07.2025"
+    },
+    {
+      id: 2,
+      title: "СОЗВОН",
+      time: "19:00",
+      date: "07.07.2025"
+    }
+  ];
+
   return (
     <div className="event-list">
+      {/* Верхняя строка */}
       <div className="event-list-top">
         <div className="event-list-left">
           <div className="arrows-group">
-            <button className="day-nav" onClick={() => changeDay(-1)}>←</button>
-            <button className="day-nav" onClick={() => changeDay(1)}>→</button>
+            <button className="day-nav" onClick={handlePrevDay}>←</button>
+            <button className="day-nav" onClick={handleNextDay}>→</button>
           </div>
           <h3>{formatDate(currentDate)}</h3>
         </div>
-        <button className="today-button-top" onClick={() => setCurrentDate(new Date())}>
-          Сегодня
-        </button>
+        <div className="event-list-right">
+          <button className="today-button-top" onClick={handleToday}>
+            Сегодня
+          </button>
+        </div>
       </div>
       
       <p className="events-subtitle">Список мероприятий</p>
 
       <div className="events-container">
         {events.map(event => (
-          <div 
+           <div 
             key={event.id} 
-            className={`event-item ${event.isMyEvent ? 'my-event' : ''}`}
-            onClick={() => onEventClick && onEventClick(event.id)}
+            className="event-item"
+            onClick={() => handleEventItemClick(event)} // Добавили onClick
           >
-            {event.isMyEvent && (
-              <div className="event-edit-wrapper">
-                <button 
-                  className="pencil-btn-clean" 
-                  onClick={(e) => {
-                    e.stopPropagation(); 
-                    onEditClick(event.id);
-                  }}
-                >
-                  <div className="pencil-icon-mask"></div>
-                </button>
-              </div>
-            )}
+            <div className="event-icon">
+              <img 
+            src="/src/assets/edit-icon.svg" 
+                alt="Edit"
+              />
+            </div>
             <span className="event-title">{event.title}</span>
-            <span className="event-time">{event.startTime}</span>
+            <span className="event-time">{event.time} {event.date}</span>
           </div>
         ))}
       </div>

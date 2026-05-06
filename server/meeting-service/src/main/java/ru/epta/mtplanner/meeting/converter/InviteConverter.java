@@ -8,9 +8,6 @@ import ru.epta.mtplanner.commons.model.notification.NotificationType;
 import ru.epta.mtplanner.meeting.dao.dto.InviteDto;
 import ru.epta.mtplanner.meeting.model.Invite;
 import ru.epta.mtplanner.meeting.model.Meeting;
-import ru.epta.mtplanner.meeting.model.enums.InviteStatus;
-
-import java.util.UUID;
 
 public class InviteConverter {
 
@@ -40,18 +37,8 @@ public class InviteConverter {
     }
 
     public InviteNotification toNotification(Invite source, NotificationType type) {
-        User actor;
-        UUID receiver;
-
-        if (type == NotificationType.SEND_INVITE) {
-            actor = source.getMeetingId().getOwner();
-            receiver = source.getUserId().getId();
-        } else {
-            actor = source.getUserId();
-            receiver = source.getMeetingId().getOwner().getId();
-        }
-
-        InviteNotification inviteNotification = new InviteNotification(actor, receiver, type);
+        InviteNotification inviteNotification = new InviteNotification(source.getMeetingId().getOwner(), source.getUserId().getId());
+        inviteNotification.setType(type);
 
         inviteNotification.setInviteId(source.getId());
 

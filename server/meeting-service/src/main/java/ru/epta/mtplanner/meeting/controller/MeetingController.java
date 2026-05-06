@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import ru.epta.mtplanner.meeting.config.annotation.CurrentUser;
 import ru.epta.mtplanner.meeting.model.Meeting;
+import ru.epta.mtplanner.meeting.model.request.CancelMeetingRequest;
 import ru.epta.mtplanner.meeting.model.request.CreateMeetingRequest;
 import ru.epta.mtplanner.meeting.model.request.GetListMeetingRequest;
 import ru.epta.mtplanner.meeting.model.request.UpdateMeetingRequest;
@@ -59,5 +60,12 @@ public class MeetingController {
                                  @Valid @RequestBody UpdateMeetingRequest request,
                                  @CurrentUser UUID currentUserId) {
         return meetingService.updateMeeting(id, request, currentUserId);
+    }
+
+    @PatchMapping("/{id}/cancel")
+    public Meeting cancelMeeting(@PathVariable UUID id,
+                                 @Valid @RequestBody CancelMeetingRequest request,
+                                 @CurrentUser UUID currentUserId) {
+        return meetingService.cancelMeeting(id, request, currentUserId);
     }
 }

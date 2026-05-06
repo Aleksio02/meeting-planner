@@ -187,6 +187,7 @@ public class InviteServiceImpl implements InviteService {
 
                 invites.add(createInvite(inviteRequest, currentUserId));
             } catch (DataIntegrityViolationException e) {
+                // Do nothing
             }
         }
         return invites;

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.epta.mtplanner.meeting.config.annotation.CurrentUser;
 import ru.epta.mtplanner.meeting.model.Invite;
 import ru.epta.mtplanner.meeting.model.enums.InviteStatus;
+import ru.epta.mtplanner.meeting.model.request.CreateListInviteRequest;
 import ru.epta.mtplanner.meeting.model.request.CreateInviteRequest;
 import ru.epta.mtplanner.meeting.model.request.GetListInviteRequest;
 import ru.epta.mtplanner.meeting.service.InviteService;
@@ -56,7 +57,13 @@ public class InviteController {
 
     @PatchMapping("/{id}/decline")
     public Invite declineInvite(@PathVariable UUID id,
-                               @CurrentUser UUID currentUserId) {
+                                @CurrentUser UUID currentUserId) {
         return inviteService.updateInvite(id, InviteStatus.DECLINED, currentUserId);
+    }
+
+    @PostMapping("/list")
+    public List<Invite> createListInvite(@Valid @RequestBody CreateListInviteRequest request,
+                                         @CurrentUser UUID currentUserId) {
+        return inviteService.createListInvite(request, currentUserId);
     }
 }

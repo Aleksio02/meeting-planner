@@ -13,6 +13,8 @@ import org.springframework.data.jpa.domain.Specification;
 import ru.epta.mtplanner.commons.dao.UserDao;
 import ru.epta.mtplanner.commons.dao.dto.UserDto;
 import ru.epta.mtplanner.commons.exception.AccessForbiddenException;
+import ru.epta.mtplanner.commons.exception.IncorrectRequestDataException;
+import ru.epta.mtplanner.meeting.dao.InviteDao;
 import ru.epta.mtplanner.meeting.dao.MeetingDao;
 import ru.epta.mtplanner.meeting.dao.dto.MeetingDto;
 import ru.epta.mtplanner.meeting.model.Meeting;
@@ -43,7 +45,13 @@ class MeetingServiceImplTest {
     MeetingDao meetingDao;
 
     @Mock
+    InviteDao inviteDao;
+
+    @Mock
     UserDao userDao;
+
+    @Mock
+    NotificationKafkaProducer notificationKafkaProducer;
 
     @InjectMocks
     MeetingServiceImpl meetingService;
@@ -69,8 +77,10 @@ class MeetingServiceImplTest {
         return dto;
     }
 
-    private CreateMeetingRequest buildCreateRequest(String title, String description,
-                                                    LocalDateTime startsAt, Integer duration, MeetingStatus status) {
+    private CreateMeetingRequest buildCreateRequest(
+        String title, String description,
+        LocalDateTime startsAt, Integer duration, MeetingStatus status
+    ) {
         CreateMeetingRequest request = new CreateMeetingRequest();
         request.setTitle(title);
         request.setDescription(description);
@@ -161,7 +171,8 @@ class MeetingServiceImplTest {
         UUID currentId = UUID.randomUUID();
         UserDto owner = buildUserDto(currentId, "Bob");
         CreateMeetingRequest request = buildCreateRequest("Sprint", "Sprint planning",
-                LocalDateTime.of(2026, 6, 1, 9, 0), 90, MeetingStatus.PLANNED);
+            LocalDateTime.of(2026, 6, 1, 9, 0), 90, MeetingStatus.PLANNED
+        );
         MeetingDto savedDto = buildMeetingDto(UUID.randomUUID(), "Sprint", owner);
 
         when(userDao.findById(currentId)).thenReturn(Optional.of(owner));
@@ -274,15 +285,8 @@ class MeetingServiceImplTest {
         UpdateMeetingRequest request = new UpdateMeetingRequest();
 
         when(meetingDao.findById(meetingId)).thenReturn(Optional.of(dto));
-        when(meetingDao.save(any(MeetingDto.class))).thenReturn(dto);
 
-        Meeting result = meetingService.updateMeeting(meetingId, request, ownerId);
-
-        assertNotNull(result);
-        assertEquals("Planning", result.getTitle());
-        verify(meetingDao).findById(meetingId);
-        verify(meetingDao).save(dto);
-        verifyNoMoreInteractions(meetingDao, userDao);
+        assertThrows(IncorrectRequestDataException.class, () -> meetingService.updateMeeting(meetingId, request, owner.getId()));
     }
 
     @Test
@@ -310,7 +314,10 @@ class MeetingServiceImplTest {
 
         when(meetingDao.findById(meetingId)).thenReturn(Optional.of(dto));
 
-        assertThrows(AccessForbiddenException.class, () -> meetingService.updateMeeting(meetingId, request, currentUserId));
+        assertThrows(
+            AccessForbiddenException.class,
+            () -> meetingService.updateMeeting(meetingId, request, currentUserId)
+        );
 
         verify(meetingDao).findById(meetingId);
         verify(meetingDao, never()).save(any());

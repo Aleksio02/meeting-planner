@@ -26,6 +26,7 @@ public class InviteDto extends AbstractEntityDto {
     @Column(name = "sent_at")
     private LocalDateTime sentAt;
 
+    @Enumerated(EnumType.STRING)
     @Column
     private InviteStatus status;
 }

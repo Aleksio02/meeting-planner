@@ -19,14 +19,15 @@ public class NotificationConverter {
         destination.setSentAt(source.getSentAt());
 
         switch (source.getType()) {
-            case SEND_INVITE -> {
+            case SEND_INVITE, ACCEPT_INVITE, DECLINE_INVITE -> {
                 InviteNotification inviteNotification = (InviteNotification) source;
                 destination.setMeetingId(inviteNotification.getMeeting().getId());
                 destination.setInviteId(inviteNotification.getInviteId());
             }
-            case CREATE_MEETING -> {
+            case CREATE_MEETING, CANCEL_MEETING, UPDATE_MEETING_DETAILS, RESCHEDULE_MEETING -> {
                 MeetingNotification meetingNotification = (MeetingNotification) source;
                 destination.setMeetingId(meetingNotification.getMeeting().getId());
+                destination.setComment(meetingNotification.getComment());
             }
             default -> throw new IllegalStateException("Unknown type of notification");
         }

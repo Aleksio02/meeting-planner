@@ -13,6 +13,7 @@ import org.springframework.data.jpa.domain.Specification;
 import ru.epta.mtplanner.commons.dao.UserDao;
 import ru.epta.mtplanner.commons.dao.dto.UserDto;
 import ru.epta.mtplanner.commons.exception.AccessForbiddenException;
+import ru.epta.mtplanner.commons.exception.IncorrectRequestDataException;
 import ru.epta.mtplanner.meeting.dao.InviteDao;
 import ru.epta.mtplanner.meeting.dao.MeetingDao;
 import ru.epta.mtplanner.meeting.dao.dto.MeetingDto;
@@ -282,18 +283,10 @@ class MeetingServiceImplTest {
         UserDto owner = buildUserDto(ownerId, "Bob");
         MeetingDto dto = buildMeetingDto(meetingId, "Planning", owner);
         UpdateMeetingRequest request = new UpdateMeetingRequest();
-        request.setDescription(Optional.of("Another description"));
 
         when(meetingDao.findById(meetingId)).thenReturn(Optional.of(dto));
-        when(meetingDao.save(any(MeetingDto.class))).thenReturn(dto);
 
-        Meeting result = meetingService.updateMeeting(meetingId, request, ownerId);
-
-        assertNotNull(result);
-        assertEquals("Planning", result.getTitle());
-        verify(meetingDao).findById(meetingId);
-        verify(meetingDao).save(dto);
-        verifyNoMoreInteractions(meetingDao, userDao);
+        assertThrows(IncorrectRequestDataException.class, () -> meetingService.updateMeeting(meetingId, request, owner.getId()));
     }
 
     @Test

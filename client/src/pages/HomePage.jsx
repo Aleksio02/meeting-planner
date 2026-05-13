@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import Header from "../components/Header";
 import Calendar from "../components/Calendar";
 import EventList from "../components/EventList";
@@ -8,6 +10,7 @@ import CreateEventForm from "../components/CreateEventForm";
 import "../styles/HomePage.css";
 
 const HomePage = () => {
+  const { user, loading } = useAuth();
   const [events, setEvents] = useState([
     { id: 1, title: "СОЗВОН (Моё)", date: "2025-07-07", startTime: "19:00", endTime: "20:30", description: "Обсуждение архитектуры", isMyEvent: true },
     { id: 2, title: "ОБЩАЯ ВСТРЕЧА", date: "2025-07-07", startTime: "20:00", endTime: "21:00", description: "Планерка", isMyEvent: false },
@@ -20,6 +23,9 @@ const HomePage = () => {
   const [selectedEventId, setSelectedEventId] = useState(null);
 
   const currentEvent = events.find(ev => ev.id === selectedEventId);
+
+  if (loading) return <div className="loading">Загрузка...</div>;
+  if (!user) return <Navigate to="/login" />;
 
   // Открыть форму создания
   const handleCreateClick = () => {

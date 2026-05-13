@@ -47,6 +47,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: opacity 0.2s ease;
+}
+
+.invitations-btn:hover,
+.notification-btn:hover {
+  opacity: 0.7;
 }
 
 .invitations-btn img,
@@ -86,6 +92,33 @@
   display: block;
 }
 
+/* Стили для кнопки выхода */
+.logout-btn {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: "Open Sans", sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-left: 5px;
+}
+
+.logout-btn:hover {
+  background: linear-gradient(135deg, #ff5252, #e04444);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.logout-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 /* === АДАПТИВНОСТЬ === */
 @media (max-width: 1024px) {
   .header {
@@ -108,6 +141,11 @@
   
   .username {
     font-size: 18px;
+  }
+  
+  .logout-btn {
+    padding: 6px 12px;
+    font-size: 13px;
   }
 }
 
@@ -152,6 +190,12 @@
     width: 60px;
     height: 60px;
   }
+  
+  .logout-btn {
+    padding: 5px 10px;
+    font-size: 11px;
+    margin-left: 0;
+  }
 }
 
 @media (max-width: 480px) {
@@ -185,5 +229,11 @@
   
   .header-right {
     gap: 10px;
+  }
+  
+  .logout-btn {
+    padding: 4px 8px;
+    font-size: 10px;
+    border-radius: 6px;
   }
 }

@@ -1,16 +1,25 @@
 import React, { useState } from "react";
-import "../styles/CreateEventForm.css";
+import { meetingsAPI } from "../api/meetings";
+import { useToast } from "../context/ToastContext";
 import TimePicker from "./TimePicker";
 import DatePicker from "./DatePicker";
+import "../styles/CreateEventForm.css";
 
-const CreateEventForm = ({ onClose }) => {
-  const [selectedTime, setSelectedTime] = useState("");
+const CreateEventForm = ({ onClose, onCreated }) => {
+  const { addToast } = useToast();
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
   const [emailInput, setEmailInput] = useState("");
   const [emails, setEmails] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
 
-  const handleChange = (date) => {
+  const handleDateChange = (date) => {
     setSelectedDate(date);
+    setErrors(prev => ({ ...prev, date: '' }));
   };
   
   const isValidEmail = (email) => {
@@ -31,8 +40,96 @@ const CreateEventForm = ({ onClose }) => {
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddEmail();
+    }
+  };
+
   const handleRemoveEmail = (emailToRemove) => {
     setEmails(emails.filter((email) => email !== emailToRemove));
+  };
+
+  const validate = () => {
+    const newErrors = {};
+
+    if (!title.trim()) newErrors.title = 'Введите название';
+    if (!selectedDate) newErrors.date = 'Выберите дату';
+    if (!startTime) newErrors.startTime = 'Выберите время начала';
+    if (!endTime) newErrors.endTime = 'Выберите время окончания';
+    if (startTime && endTime && startTime >= endTime) {
+      newErrors.endTime = 'Окончание должно быть позже начала';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const handleSubmit = async () => {
+    if (!validate()) {
+      addToast('Проверьте заполнение полей', 'error');
+      return;
+    }
+
+    const [startHour, startMin] = startTime.split(':').map(Number);
+    const [endHour, endMin] = endTime.split(':').map(Number);
+    const durationMinutes = (endHour * 60 + endMin) - (startHour * 60 + startMin);
+
+    const meetingData = {
+      title: title.trim(),
+      description: description.trim(),
+      date: formatDate(selectedDate),
+      startTime: startTime,
+      endTime: endTime,
+      duration: durationMinutes,
+      participants: emails,
+      status: "PLANNED",
+    };
+
+    console.log('Отправляем:', meetingData);
+
+    setLoading(true);
+    try {
+      const { data } = await meetingsAPI.create(meetingData);
+
+      addToast('✅ Встреча создана!', 'success', 3000);
+
+      if (onCreated) {
+        onCreated({
+          id: data.id,
+          title: data.title,
+          date: data.date || formatDate(selectedDate),
+          startTime: data.startTime || startTime,
+          endTime: data.endTime || endTime,
+          description: data.description || description,
+          isMyEvent: true,
+          participants: data.participants || emails,
+        });
+      }
+
+      onClose();
+
+    } catch (error) {
+      console.error('Ошибка создания:', error);
+      const data = error.response?.data;
+      const errorMessage = data?.errorMessage || data?.message || 'Ошибка при создании встречи';
+
+      if (!error.response) {
+        addToast('❌ Нет соединения с сервером', 'error', 6000);
+      } else {
+        addToast(`❌ ${errorMessage}`, 'error', 6000);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const timeOptions = [];
@@ -47,7 +144,6 @@ const CreateEventForm = ({ onClose }) => {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        {/* КРЕСТИК ЗАКРЫТИЯ */}
         <button className="modal-close-x" onClick={onClose}>✕</button>
         
         <div className="input-content">
@@ -55,10 +151,20 @@ const CreateEventForm = ({ onClose }) => {
             type="text"
             className="event-title-input"
             placeholder="Добавьте название"
+            value={title}
+            onChange={(e) => {
+              setTitle(e.target.value);
+              setErrors(prev => ({ ...prev, title: '' }));
+            }}
+            style={errors.title ? { borderColor: '#ff4757' } : {}}
           />
+          {errors.title && <span className="field-hint">{errors.title}</span>}
+          
           <textarea
             className="event-discription-input"
             placeholder="Описание"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
           ></textarea>
         </div>
 
@@ -66,16 +172,34 @@ const CreateEventForm = ({ onClose }) => {
           <img src="/src/assets/time.svg" alt="time" className="icon-time" />
           <DatePicker
             selected={selectedDate}
-            onChange={handleChange}
+            onChange={handleDateChange}
             locale="ru"
             dateFormat="eee, dd MMM yyyy 'г.'"
             placeholderText="Выберите дату"
-            className="datepicker-input"
+            className={`datepicker-input ${errors.date ? 'input-error' : ''}`}
             calendarClassName="event-calendar"
           />
-          <TimePicker options={timeOptions} onChange={setSelectedTime} />
-          <span className="time-separator"> _ </span>
-          <TimePicker options={timeOptions} onChange={setSelectedTime} />
+          {errors.date && <span className="field-hint">{errors.date}</span>}
+          
+          <TimePicker 
+            options={timeOptions} 
+            onChange={(val) => {
+              setStartTime(val);
+              setErrors(prev => ({ ...prev, startTime: '' }));
+            }} 
+          />
+          {errors.startTime && <span className="field-hint">{errors.startTime}</span>}
+          
+          <span className="time-separator"> — </span>
+          
+          <TimePicker 
+            options={timeOptions} 
+            onChange={(val) => {
+              setEndTime(val);
+              setErrors(prev => ({ ...prev, endTime: '' }));
+            }} 
+          />
+          {errors.endTime && <span className="field-hint">{errors.endTime}</span>}
         </div>
 
         <div className="inputs-row column-layout">
@@ -87,6 +211,7 @@ const CreateEventForm = ({ onClose }) => {
               className="user-input"
               value={emailInput}
               onChange={(e) => setEmailInput(e.target.value)}
+              onKeyDown={handleKeyDown}
             />
             <button
               className="add-button"
@@ -120,7 +245,14 @@ const CreateEventForm = ({ onClose }) => {
             </p>
           )}
         </div>
-        <button className="event-create">Создать событие</button>
+
+        <button 
+          className="event-create" 
+          onClick={handleSubmit}
+          disabled={loading}
+        >
+          {loading ? 'Создание...' : 'Создать событие'}
+        </button>
       </div>
     </div>
   );

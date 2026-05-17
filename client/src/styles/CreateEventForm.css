@@ -323,3 +323,17 @@ body * {
   color: #fff;
   transform: rotate(90deg);
 }
+.field-hint {
+  color: #ff4757;
+  font-size: 12px;
+  font-weight: 500;
+  display: block;
+  text-align: left;
+  padding-left: 4px;
+  margin-top: -5px;
+  margin-bottom: 8px;
+}
+
+.input-error {
+  border-color: #ff4757 !important;
+}

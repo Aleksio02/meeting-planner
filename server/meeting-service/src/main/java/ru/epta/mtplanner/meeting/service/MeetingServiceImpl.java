@@ -160,6 +160,7 @@ public class MeetingServiceImpl implements MeetingService {
 
         request.getStartsAt().ifPresent(startsAt -> {
             meetingDto.setStartsAt(startsAt);
+            meetingDto.setStatus(MeetingStatus.POSTPONED);
             isStartDateChanged[0] = true;
 
         });
@@ -179,8 +180,6 @@ public class MeetingServiceImpl implements MeetingService {
             isDetailsChanged[0] = true;
         });
 
-        request.getStatus().ifPresent(status -> meetingDto.setStatus(status));
-
         if (!isDetailsChanged[0] && !isStartDateChanged[0]) {
             throw new IncorrectRequestDataException("No changes detected");
         }
@@ -193,11 +192,9 @@ public class MeetingServiceImpl implements MeetingService {
 
         List<InviteDto> participants = inviteDao.findAllByMeetingIdAndStatus(meetingDto.getId(), InviteStatus.ACCEPTED);
 
-        List<UUID> receivers = new ArrayList<>(participants.size());
-        participants.stream()
+        List<UUID> receivers = participants.stream()
                 .map(inv -> inv.getUser().getId())
-                .forEach(receivers::add);
-
+                .toList();
 
         if (isDetailsChanged[0]) {
             notificationKafkaProducer.sendNotification(meetingConverter.toNotification(meeting, NotificationType.UPDATE_MEETING_DETAILS, null, receivers));
@@ -247,4 +244,37 @@ public class MeetingServiceImpl implements MeetingService {
         return meeting;
     }
 
+    @Override
+    @Transactional
+    public Meeting completeMeeting(UUID id, UUID currentUserId) {
+        MeetingDto meetingDto = meetingDao.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Meeting not found with id: " + id));
+
+        UUID ownerId = meetingDto.getOwnerId().getId();
+
+        if (!currentUserId.equals(ownerId)) {
+            throw new AccessForbiddenException("You are not the owner of the meeting. Only the meeting owner can complete it.");
+        }
+
+        if (meetingDto.getStatus() == MeetingStatus.COMPLETED) {
+            throw new IllegalStateException("Meeting is already completed");
+        }
+
+        meetingDto.setStatus(MeetingStatus.COMPLETED);
+
+        MeetingDto completedMeeting = meetingDao.save(meetingDto);
+
+        Meeting meeting = new Meeting();
+        MeetingConverter meetingConverter = new MeetingConverter();
+        meetingConverter.fromDto(completedMeeting, meeting);
+
+        List<InviteDto> participants = inviteDao.findAllByMeetingIdAndStatus(meetingDto.getId(), InviteStatus.ACCEPTED);
+        List<UUID> receivers = participants.stream()
+                .map(inv -> inv.getUser().getId())
+                .toList();
+
+        notificationKafkaProducer.sendNotification(meetingConverter.toNotification(meeting, NotificationType.COMPLETE_MEETING, null, receivers));
+
+        return meeting;
+    }
 }

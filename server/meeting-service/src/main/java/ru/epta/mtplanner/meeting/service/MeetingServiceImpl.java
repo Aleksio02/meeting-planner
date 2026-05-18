@@ -103,7 +103,7 @@ public class MeetingServiceImpl implements MeetingService {
         meetingDto.setDescription(request.getDescription());
         meetingDto.setStartsAt(LocalDateTime.now());
         meetingDto.setDuration(request.getDuration());
-        meetingDto.setStatus(request.getStatus());
+        meetingDto.setStatus(MeetingStatus.PLANNED);
 
         UserDto owner = userDao.findById(currentId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found: " + currentId));

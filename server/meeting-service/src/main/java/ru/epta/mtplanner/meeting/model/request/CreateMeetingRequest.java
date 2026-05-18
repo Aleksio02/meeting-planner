@@ -17,7 +17,6 @@ public class CreateMeetingRequest {
     private UUID ownerId;
     private LocalDateTime startsAt;
     private Integer duration;
-    private MeetingStatus status;
     private List<UUID> invitedUserIds;
 
 }

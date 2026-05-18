@@ -68,4 +68,11 @@ public class MeetingController {
                                  @CurrentUser UUID currentUserId) {
         return meetingService.cancelMeeting(id, request, currentUserId);
     }
+
+    @PatchMapping("/{id}/complete")
+    public Meeting completeMeeting(@PathVariable UUID id,
+                                   @CurrentUser UUID currentUserId)  {
+        return meetingService.completeMeeting(id, currentUserId);
+    }
+
 }

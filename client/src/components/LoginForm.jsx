@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authAPI } from '../api/auth';
+import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 
 // Валидация одного поля
@@ -24,6 +24,7 @@ const validateField = (name, value) => {
 const LoginForm = () => {
   const navigate = useNavigate();
   const { addToast } = useToast();
+  const { login } = useAuth();
 
   const [formData, setFormData] = useState({
     login: '',
@@ -110,12 +111,8 @@ const LoginForm = () => {
 
     setLoading(true);
     try {
-      const response = await authAPI.login({
-        login: formData.login.trim(),
-        password: formData.password,
-      });
+      await login(formData.login.trim(), formData.password);
 
-      // Кука sessionId установится автоматически
       addToast(' Вход выполнен! Перенаправляем...', 'success', 3000);
 
       setTimeout(() => {

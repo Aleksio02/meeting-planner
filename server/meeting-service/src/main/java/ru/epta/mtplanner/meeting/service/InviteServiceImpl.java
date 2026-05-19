@@ -2,6 +2,7 @@ package ru.epta.mtplanner.meeting.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.context.annotation.Primary;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -178,14 +179,17 @@ public class InviteServiceImpl implements InviteService {
         List<Invite> invites = new ArrayList<>(userIds.size());
 
         for (UUID userId : userIds) {
-            CreateInviteRequest inviteRequest = new CreateInviteRequest();
-            inviteRequest.setMeetingId(request.getMeetingId());
-            inviteRequest.setUserId(userId);
-            inviteRequest.setStatus(InviteStatus.PENDING);
+            try {
+                CreateInviteRequest inviteRequest = new CreateInviteRequest();
+                inviteRequest.setMeetingId(request.getMeetingId());
+                inviteRequest.setUserId(userId);
+                inviteRequest.setStatus(InviteStatus.PENDING);
 
-            invites.add(createInvite(inviteRequest, currentUserId));
+                invites.add(createInvite(inviteRequest, currentUserId));
+            } catch (DataIntegrityViolationException e) {
+                // Do nothing
+            }
         }
-
         return invites;
     }
 }

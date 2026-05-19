@@ -1,10 +1,19 @@
 import React, { useState, useRef } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import NotificationsModal from './NotificationsModal';
 import '../styles/Header.css';
 
 const Header = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const notificationBtnRef = useRef(null);
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
+  };
 
   return (
     <header className="header">
@@ -37,13 +46,16 @@ const Header = () => {
         </button>
         
         <div className="user-profile">
-          <span className="username">1mperium</span>
+          <span className="username">{user?.username || user?.login || 'Гость'}</span>
           <div className="avatar">
             <img 
               src="/src/assets/avatar.jpg" 
               alt="Avatar"
             />
           </div>
+          <button onClick={handleLogout} className="logout-btn" style={{ marginLeft: '10px' }}>
+            Выйти
+          </button>
         </div>
       </div>
 

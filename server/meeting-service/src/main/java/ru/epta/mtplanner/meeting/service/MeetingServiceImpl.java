@@ -30,10 +30,7 @@ import ru.epta.mtplanner.meeting.dao.specification.MeetingSpecification;
 import ru.epta.mtplanner.meeting.model.Meeting;
 import ru.epta.mtplanner.meeting.model.enums.InviteStatus;
 import ru.epta.mtplanner.meeting.model.enums.MeetingStatus;
-import ru.epta.mtplanner.meeting.model.request.CancelMeetingRequest;
-import ru.epta.mtplanner.meeting.model.request.CreateMeetingRequest;
-import ru.epta.mtplanner.meeting.model.request.GetListMeetingRequest;
-import ru.epta.mtplanner.meeting.model.request.UpdateMeetingRequest;
+import ru.epta.mtplanner.meeting.model.request.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,11 +47,14 @@ public class MeetingServiceImpl implements MeetingService {
     private final UserDao userDao;
     private final NotificationKafkaProducer notificationKafkaProducer;
 
-    public MeetingServiceImpl(MeetingDao meetingDao, InviteDao inviteDao, UserDao userDao, NotificationKafkaProducer notificationKafkaProducer) {
+    private final InviteService inviteService;
+
+    public MeetingServiceImpl(MeetingDao meetingDao, InviteDao inviteDao, UserDao userDao, NotificationKafkaProducer notificationKafkaProducer, InviteService inviteService) {
         this.meetingDao = meetingDao;
         this.inviteDao = inviteDao;
         this.userDao = userDao;
         this.notificationKafkaProducer = notificationKafkaProducer;
+        this.inviteService = inviteService;
     }
 
     @Override
@@ -101,7 +101,7 @@ public class MeetingServiceImpl implements MeetingService {
         MeetingDto meetingDto = new MeetingDto();
         meetingDto.setTitle(request.getTitle());
         meetingDto.setDescription(request.getDescription());
-        meetingDto.setStartsAt(request.getStartsAt());
+        meetingDto.setStartsAt(LocalDateTime.now());
         meetingDto.setDuration(request.getDuration());
         meetingDto.setStatus(request.getStatus());
 
@@ -116,6 +116,14 @@ public class MeetingServiceImpl implements MeetingService {
         meetingConverter.fromDto(savedMeeting, meeting);
 
         notificationKafkaProducer.sendNotification(meetingConverter.toNotification(meeting, NotificationType.CREATE_MEETING));
+
+        List<UUID> userIds = request.getInvitedUserIds();
+        if (!userIds.isEmpty()) {
+            CreateListInviteRequest inviteRequest = new CreateListInviteRequest();
+            inviteRequest.setMeetingId(meetingDto.getId());
+            inviteRequest.setUserIds(userIds);
+            inviteService.createListInvite(inviteRequest, currentId);
+        }
 
         return meeting;
     }

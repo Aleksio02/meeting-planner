@@ -6,7 +6,7 @@ import InvitesModal from './InvitesModal';
 import NotificationsModal from './NotificationsModal';
 import '../styles/Header.css';
 
-const Header = () => {
+const Header = ({ onRefreshMeetings }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isInvitesOpen, setIsInvitesOpen] = useState(false);
@@ -29,8 +29,9 @@ const Header = () => {
         
         const filtered = Array.isArray(data)
           ? data.filter(inv => {
+              const invitedUserId = inv.userId?.id;
               const ownerId = inv.meetingId?.owner?.id;
-              return ownerId !== currentUserId && !viewedIds.includes(inv.id);
+              return invitedUserId === currentUserId && ownerId !== currentUserId && !viewedIds.includes(inv.id);
             })
           : [];
         
@@ -40,7 +41,7 @@ const Header = () => {
 
     if (user) {
       loadNewCount();
-      const interval = setInterval(loadNewCount, 30000);
+      const interval = setInterval(loadNewCount, 10000);
       return () => clearInterval(interval);
     }
   }, [user]);
@@ -80,8 +81,18 @@ const Header = () => {
         </div>
       </div>
 
-      <InvitesModal isOpen={isInvitesOpen} onClose={handleInvitesClose} anchorRef={invitesBtnRef} />
-      <NotificationsModal isOpen={isNotificationsOpen} onClose={() => setIsNotificationsOpen(false)} anchorRef={notificationBtnRef} />
+      <InvitesModal 
+        isOpen={isInvitesOpen} 
+        onClose={handleInvitesClose} 
+        anchorRef={invitesBtnRef} 
+        onAccepted={onRefreshMeetings}
+      />
+
+      <NotificationsModal 
+        isOpen={isNotificationsOpen} 
+        onClose={() => setIsNotificationsOpen(false)} 
+        anchorRef={notificationBtnRef} 
+      />
     </header>
   );
 };

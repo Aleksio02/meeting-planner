@@ -398,5 +398,69 @@
     border-radius: 10px; 
 }
 
-/* Остальные стили из прошлых ответов (оверлей, модалка и т.д.) */
-/* ... (сохрани свои предыдущие стили для фона и кнопок) ... */
+.invite-body .email-add-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.invite-body .email-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 15px;
+}
+
+.invite-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 15px 20px;
+  border-top: 1px solid #4e453d;
+}
+
+.cancel-btn {
+  background: transparent;
+  border: 2px solid rgba(251, 181, 100, 0.4);
+  color: #fbb564;
+  padding: 10px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.invite-btn {
+  background-color: #fbb564;
+  color: #3e3731;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.invite-btn:hover {
+  background-color: #ffc87c;
+}
+
+.invite-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.invite-body .add-btn {
+  background-color: #fbb564;
+  color: #3e3731;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.3s;
+}
+
+.invite-body .add-btn:hover {
+  background-color: #ffc87c;
+}

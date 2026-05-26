@@ -1,172 +1,150 @@
-import React, { useState } from 'react';
-import { usersAPI } from '../api/users';
+import React, { useState, useEffect, useRef } from 'react';
+import { invitesAPI } from '../api/invites';
+import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import '../styles/NotificationsModal.css';
 
-const InviteModal = ({ isOpen, onClose, onAddParticipants, currentParticipants }) => {
-  const [searchValue, setSearchValue] = useState('');
-  const [suggestions, setSuggestions] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [searchTimeout, setSearchTimeout] = useState(null);
-  const [selectedUsers, setSelectedUsers] = useState([]);
+const InvitesModal = ({ isOpen, onClose, anchorRef, onAccepted }) => {
+  const { user } = useAuth();
   const { addToast } = useToast();
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+  const [isPositioned, setIsPositioned] = useState(false);
+  const [invites, setInvites] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const modalRef = useRef(null);
+  const listRef = useRef(null);
 
-  const handleInputChange = (e) => {
-    const value = e.target.value;
-    setSearchValue(value);
-
-    if (searchTimeout) clearTimeout(searchTimeout);
-
-    if (value.trim().length < 2) {
-      setSuggestions([]);
-      setShowSuggestions(false);
-      return;
-    }
-
-    const timeout = setTimeout(async () => {
-      try {
-        const { data } = await usersAPI.searchByUsername(value.trim());
-        
-        const searchTerm = value.trim().toLowerCase();
-        const filtered = Array.isArray(data) 
-          ? data.filter(user => {
-              const username = (user.username || user.login || '').toLowerCase();
-              const email = (user.email || '').toLowerCase();
-              const alreadyAdded = selectedUsers.some(u => u.id === user.id) ||
-                                   currentParticipants?.some(p => p.toLowerCase() === username);
-              return (username.includes(searchTerm) || email.includes(searchTerm)) && !alreadyAdded;
-            })
-          : [];
-        
-        setSuggestions(filtered);
-        setShowSuggestions(filtered.length > 0);
-      } catch (error) {
-        setSuggestions([]);
-        setShowSuggestions(false);
-      }
-    }, 300);
-
-    setSearchTimeout(timeout);
-  };
-
-  const handleSelectSuggestion = (user) => {
-    if (selectedUsers.some(u => u.id === user.id)) {
-      addToast('Этот участник уже добавлен', 'error');
-      return;
-    }
-    setSelectedUsers(prev => [...prev, { id: user.id, username: user.username || user.login }]);
-    setSearchValue('');
-    setSuggestions([]);
-    setShowSuggestions(false);
-  };
-
-  const handleAddParticipant = () => {
-    const trimmed = searchValue.trim();
-    if (!trimmed) return;
-
-    if (selectedUsers.some(u => u.username.toLowerCase() === trimmed.toLowerCase())) {
-      addToast('Этот участник уже добавлен', 'error');
-      return;
-    }
-
-    if (suggestions.length > 0) {
-      handleSelectSuggestion(suggestions[0]);
-    } else {
-      addToast('Пользователь не найден', 'error');
+  const updatePosition = () => {
+    if (anchorRef?.current) {
+      const rect = anchorRef.current.getBoundingClientRect();
+      const modalWidth = modalRef.current?.offsetWidth || 400;
+      setPosition({ top: rect.bottom + 10, left: rect.right - modalWidth });
+      setIsPositioned(true);
     }
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleAddParticipant();
+  useEffect(() => {
+    if (isOpen) { setIsPositioned(false); loadInvites(); setTimeout(() => updatePosition(), 10); }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition);
+    return () => {
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition);
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!loading && invites.length > 0 && listRef.current) {
+      listRef.current.scrollTop = listRef.current.scrollHeight;
+    }
+  }, [loading, invites]);
+
+  const loadInvites = async () => {
+    setLoading(true);
+    try {
+      const { data } = await invitesAPI.getList({ page: 0, pageSize: 50 });
+      const currentUserId = user?.currentUser?.id || user?.id;
+      
+      const filtered = Array.isArray(data) 
+        ? data.filter(inv => {
+            const invitedUserId = inv.userId?.id;
+            const ownerId = inv.meetingId?.owner?.id;
+            return invitedUserId === currentUserId && ownerId !== currentUserId && inv.status === 'Ожидает';
+          })
+        : [];
+      
+      setInvites(filtered);
+    } catch (error) {
+      console.error('Ошибка загрузки:', error);
+      setInvites([]);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleRemoveUser = (index) => {
-    setSelectedUsers(prev => prev.filter((_, i) => i !== index));
+  const handleAccept = async (id) => {
+    try {
+      await invitesAPI.accept(id);
+      addToast('✅ Приглашение принято!', 'success', 2000);
+      setInvites(prev => prev.filter(inv => inv.id !== id));
+      if (onAccepted) setTimeout(() => onAccepted(), 500);
+    } catch (error) {
+      console.error('Ошибка принятия:', error);
+      addToast('❌ Ошибка при принятии', 'error');
+    }
   };
 
-  const handleInvite = () => {
-    if (selectedUsers.length === 0) {
-      addToast('Выберите хотя бы одного участника', 'error');
-      return;
+  const handleDecline = async (id) => {
+    try {
+      await invitesAPI.decline(id);
+      addToast('Приглашение отклонено', 'info', 2000);
+      setInvites(prev => prev.filter(inv => inv.id !== id));
+      if (onAccepted) setTimeout(() => onAccepted(), 500);
+    } catch (error) {
+      console.error('Ошибка отклонения:', error);
+      addToast('❌ Ошибка при отклонении', 'error');
     }
-    onAddParticipants(selectedUsers.map(u => u.username));
-    setSelectedUsers([]);
-    setSearchValue('');
-    onClose();
+  };
+
+  const formatTime = (dateStr) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diff = Math.floor((now - date) / 60000);
+    if (diff < 1) return 'только что';
+    if (diff < 60) return `${diff} мин назад`;
+    if (diff < 1440) return `${Math.floor(diff / 60)} ч назад`;
+    return date.toLocaleDateString('ru-RU');
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="invite-modal-overlay" onClick={onClose}>
-      <div className="invite-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="invite-header">
-          <h3>Пригласить участников</h3>
-          <button className="modal-close-x" onClick={onClose}>✕</button>
+    <>
+      <div className="modal-overlay" onClick={onClose} />
+      <div ref={modalRef} className={`notifications-modal ${!isPositioned ? 'hidden' : ''}`} style={{ top: `${position.top}px`, left: `${position.left}px` }}>
+        <div className="modal-header">
+          <h3>Приглашения</h3>
+          <button className="close-btn" onClick={onClose}>✕</button>
         </div>
-
-        <div className="invite-body">
-          <div className="email-add-section">
-            <div className="autocomplete-wrapper">
-              <input
-                type="text"
-                autoFocus
-                placeholder="Никнейм участника"
-                className="participant-input"
-                value={searchValue}
-                onChange={handleInputChange}
-                onKeyDown={handleKeyDown}
-                onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
-                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-              />
-              
-              {showSuggestions && suggestions.length > 0 && (
-                <ul className="suggestions-list">
-                  {suggestions.map((user) => (
-                    <li
-                      key={user.id}
-                      className="suggestion-item"
-                      onMouseDown={() => handleSelectSuggestion(user)}
-                    >
-                      <span className="suggestion-username">
-                        {user.username || user.login}
-                      </span>
-                      {user.email && (
-                        <span className="suggestion-email">{user.email}</span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-            <button className="add-btn" onClick={handleAddParticipant}>
-              Добавить
-            </button>
-          </div>
-
-          {selectedUsers.length > 0 && (
-            <div className="email-tags-container">
-              {selectedUsers.map((user, index) => (
-                <div className="email-tag" key={user.id}>
-                  {user.username}
-                  <button className="remove-tag" onClick={() => handleRemoveUser(index)}>✕</button>
-                </div>
-              ))}
-            </div>
+        <div className="notifications-list" ref={listRef}>
+          {loading && <p style={{ color: '#fbb564', textAlign: 'center' }}>Загрузка...</p>}
+          {!loading && invites.length === 0 && (
+            <p style={{ color: '#808080', textAlign: 'center' }}>Нет входящих приглашений</p>
           )}
-        </div>
-
-        <div className="invite-footer">
-          <button className="cancel-btn" onClick={onClose}>Отмена</button>
-          <button className="invite-btn" onClick={handleInvite} disabled={selectedUsers.length === 0}>
-            Пригласить
-          </button>
+          {invites.map((invite) => (
+            <div key={invite.id} className="notification-item">
+              <div className="notification-header">
+                <div className="notification-content">
+                  <p className="notification-message">
+                    Вас пригласили на мероприятие{' '}
+                    <span className="event-name">"{invite.meetingId?.title || 'Без названия'}"</span>
+                  </p>
+                  <p style={{ color: '#808080', fontSize: 13, margin: '4px 0 0 0' }}>
+                    От: {invite.meetingId?.owner?.username || 'Неизвестно'}
+                  </p>
+                  {invite.meetingId?.startsAt && (
+                    <p style={{ color: '#808080', fontSize: 13, margin: '4px 0 0 0' }}>
+                      {new Date(invite.meetingId.startsAt).toLocaleString('ru-RU')}
+                    </p>
+                  )}
+                </div>
+                <span className="notification-time">{formatTime(invite.sentAt)}</span>
+              </div>
+              <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
+                <button className="vote-button" onClick={() => handleAccept(invite.id)}>✓ Принять</button>
+                <button className="vote-button" style={{ color: '#ff4757' }} onClick={() => handleDecline(invite.id)}>✕ Отклонить</button>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
-export default InviteModal;
+export default InvitesModal;

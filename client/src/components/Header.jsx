@@ -3,42 +3,38 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { invitesAPI } from '../api/invites';
 import InvitesModal from './InvitesModal';
-import NotificationsModal from './NotificationsModal';
 import '../styles/Header.css';
 
 const Header = ({ onRefreshMeetings }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isInvitesOpen, setIsInvitesOpen] = useState(false);
-  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [newInvitesCount, setNewInvitesCount] = useState(0);
   const invitesBtnRef = useRef(null);
-  const notificationBtnRef = useRef(null);
 
   const handleLogout = async () => {
     await logout();
     navigate('/login');
   };
 
-  useEffect(() => {
-    const loadNewCount = async () => {
-      try {
-        const { data } = await invitesAPI.getList({ status: 'PENDING', page: 0, pageSize: 100 });
-        const viewedIds = JSON.parse(localStorage.getItem('viewedInvites') || '[]');
-        const currentUserId = user?.currentUser?.id || user?.id;
-        
-        const filtered = Array.isArray(data)
-          ? data.filter(inv => {
-              const invitedUserId = inv.userId?.id;
-              const ownerId = inv.meetingId?.owner?.id;
-              return invitedUserId === currentUserId && ownerId !== currentUserId && !viewedIds.includes(inv.id);
-            })
-          : [];
-        
-        setNewInvitesCount(filtered.length);
-      } catch (error) {}
-    };
+  const loadNewCount = async () => {
+    try {
+      const { data } = await invitesAPI.getList({ page: 0, pageSize: 100 });
+      const currentUserId = user?.currentUser?.id || user?.id;
+      
+      const count = Array.isArray(data)
+        ? data.filter(inv => {
+            return inv.userId?.id === currentUserId && 
+                   inv.meetingId?.owner?.id !== currentUserId && 
+                   inv.status === 'Ожидает';
+          }).length
+        : 0;
+      
+      setNewInvitesCount(count);
+    } catch (error) {}
+  };
 
+  useEffect(() => {
     if (user) {
       loadNewCount();
       const interval = setInterval(loadNewCount, 10000);
@@ -46,13 +42,16 @@ const Header = ({ onRefreshMeetings }) => {
     }
   }, [user]);
 
-  const handleInvitesOpen = () => {
-    setIsInvitesOpen(true);
-  };
-
+  const handleInvitesOpen = () => setIsInvitesOpen(true);
+  
   const handleInvitesClose = () => {
     setIsInvitesOpen(false);
-    setNewInvitesCount(0);
+    loadNewCount();
+  };
+
+  const handleInviteAction = () => {
+    loadNewCount();
+    if (onRefreshMeetings) onRefreshMeetings();
   };
 
   return (
@@ -68,7 +67,7 @@ const Header = ({ onRefreshMeetings }) => {
           {newInvitesCount > 0 && <span className="badge">{newInvitesCount}</span>}
         </button>
 
-        <button className="notification-btn" ref={notificationBtnRef} onClick={() => setIsNotificationsOpen(true)}>
+        <button className="notification-btn">
           <img src="/src/assets/notification.svg" alt="Notifications" />
         </button>
         
@@ -85,13 +84,7 @@ const Header = ({ onRefreshMeetings }) => {
         isOpen={isInvitesOpen} 
         onClose={handleInvitesClose} 
         anchorRef={invitesBtnRef} 
-        onAccepted={onRefreshMeetings}
-      />
-
-      <NotificationsModal 
-        isOpen={isNotificationsOpen} 
-        onClose={() => setIsNotificationsOpen(false)} 
-        anchorRef={notificationBtnRef} 
+        onAccepted={handleInviteAction}
       />
     </header>
   );

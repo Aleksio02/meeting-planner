@@ -25,33 +25,24 @@ const HomePage = () => {
   const loadMeetings = useCallback(async () => {
     try {
       const currentUserId = user?.currentUser?.id || user?.id;
-      
       const { data: meetingsData } = await meetingsAPI.getList();
       
       let acceptedMeetingIds = [];
       try {
-        const { data: invitesData } = await invitesAPI.getList({
-          status: 'ACCEPTED',
-          page: 0,
-          pageSize: 100,
-        });
+        const { data: invitesData } = await invitesAPI.getList({ page: 0, pageSize: 100 });
         acceptedMeetingIds = invitesData
-          .filter(inv => inv.userId?.id === currentUserId)
+          .filter(inv => inv.userId?.id === currentUserId && inv.status === 'Принято')
           .map(inv => inv.meetingId?.id)
           .filter(Boolean);
-      } catch (e) {
-        console.warn('Не удалось загрузить приглашения:', e);
-      }
-      
+      } catch (e) {}
+
       const mappedEvents = meetingsData.map(meeting => ({
         id: meeting.id,
         title: meeting.title,
-        date: meeting.date,
         startTime: meeting.startsAt ? new Date(meeting.startsAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) : '',
         endTime: meeting.startsAt && meeting.duration ? new Date(new Date(meeting.startsAt).getTime() + meeting.duration * 60000).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) : '',
         description: meeting.description,
         isMyEvent: meeting.owner?.id === currentUserId,
-        ownerId: meeting.owner?.id,
         status: meeting.status,
       }));
 
@@ -63,18 +54,13 @@ const HomePage = () => {
       
       setEvents(filtered);
     } catch (error) {
-      console.error('Ошибка загрузки встреч:', error);
       setEvents([]);
     } finally {
       setIsLoadingEvents(false);
     }
   }, [user]);
 
-  useEffect(() => {
-    if (user) {
-      loadMeetings();
-    }
-  }, [user, loadMeetings]);
+  useEffect(() => { if (user) loadMeetings(); }, [user, loadMeetings]);
 
   const currentEvent = events.find(ev => ev.id === selectedEventId);
 
@@ -83,102 +69,38 @@ const HomePage = () => {
 
   const handleCreateClick = () => setIsCreateOpen(true);
   const handleCloseCreate = () => setIsCreateOpen(false);
-
-  const handleEventCreated = (newEvent) => {
-    setEvents(prev => [newEvent, ...prev]);
-  };
-
-  const refreshMeetings = () => {
-    loadMeetings();
-  };
-
-  const handleEditClick = (id) => {
-    setSelectedEventId(id);
-    setIsEditOpen(true);
-  };
-
-  const handleEventClick = (id) => {
-    setSelectedEventId(id);
-    setIsViewOpen(true);
-  };
+  const handleEventCreated = (newEvent) => setEvents(prev => [newEvent, ...prev]);
+  const refreshMeetings = () => loadMeetings();
+  const handleEditClick = (id) => { setSelectedEventId(id); setIsEditOpen(true); };
+  const handleEventClick = (id) => { setSelectedEventId(id); setIsViewOpen(true); };
 
   const handleSaveEdit = async (eventData) => {
     try {
-      const updateData = {};
-      if (eventData.title) updateData.title = eventData.title;
-      if (eventData.description !== undefined) updateData.description = eventData.description;
-      
-      await meetingsAPI.update(eventData.id, updateData);
-      
+      await meetingsAPI.update(eventData.id, eventData);
       setEvents(prev => prev.map(ev => (ev.id === eventData.id ? { ...ev, ...eventData } : ev)));
-      setIsEditOpen(false);
-      setSelectedEventId(null);
-      
-      addToast(' Изменения сохранены!', 'success', 3000);
+      setIsEditOpen(false); setSelectedEventId(null);
+      addToast('✅ Изменения сохранены!', 'success', 3000);
     } catch (error) {
-      console.error('Ошибка сохранения:', error);
-      addToast(' Ошибка при сохранении', 'error', 6000);
+      addToast('❌ Ошибка при сохранении', 'error', 6000);
     }
   };
 
-  const handleCloseEdit = () => {
-    setIsEditOpen(false);
-    setSelectedEventId(null);
-  };
-
-  const handleCloseView = () => {
-    setIsViewOpen(false);
-    setSelectedEventId(null);
-  };
+  const handleCloseEdit = () => { setIsEditOpen(false); setSelectedEventId(null); };
+  const handleCloseView = () => { setIsViewOpen(false); setSelectedEventId(null); };
 
   return (
     <div className="home-page">
       <Header onRefreshMeetings={refreshMeetings} />
-      
-      <button className="create-button" onClick={handleCreateClick}>
-        + Создать событие
-      </button>
-
-      <div className="calendar-wrapper">
-        <Calendar onDateSelect={(date) => console.log(date)} />
-      </div>
-
+      <button className="create-button" onClick={handleCreateClick}>+ Создать событие</button>
+      <div className="calendar-wrapper"><Calendar onDateSelect={(date) => console.log(date)} /></div>
       {isLoadingEvents ? (
-        <div className="event-list-loading">
-          <div className="spinner" />
-          Загрузка встреч...
-        </div>
+        <div className="event-list-loading"><div className="spinner" />Загрузка встреч...</div>
       ) : (
-        <EventList 
-          events={events} 
-          onEventClick={handleEventClick} 
-          onEditClick={handleEditClick} 
-        />
+        <EventList events={events} onEventClick={handleEventClick} onEditClick={handleEditClick} />
       )}
-
-      {isCreateOpen && (
-        <CreateEventForm 
-          onClose={handleCloseCreate} 
-          onCreated={handleEventCreated} 
-        />
-      )}
-
-      {isEditOpen && (
-        <EventEdit 
-          isOpen={isEditOpen} 
-          onClose={handleCloseEdit} 
-          eventData={currentEvent}
-          onSave={handleSaveEdit} 
-        />
-      )}
-      
-      {isViewOpen && (
-        <EventView 
-          isOpen={isViewOpen} 
-          onClose={handleCloseView} 
-          eventId={selectedEventId}
-        />
-      )}
+      {isCreateOpen && <CreateEventForm onClose={handleCloseCreate} onCreated={handleEventCreated} />}
+      {isEditOpen && <EventEdit isOpen={isEditOpen} onClose={handleCloseEdit} eventData={currentEvent} onSave={handleSaveEdit} />}
+      {isViewOpen && <EventView isOpen={isViewOpen} onClose={handleCloseView} eventId={selectedEventId} />}
     </div>
   );
 };

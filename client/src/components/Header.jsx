@@ -1,18 +1,62 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { invitesAPI } from '../api/invites';
+import InvitesModal from './InvitesModal';
 import NotificationsModal from './NotificationsModal';
 import '../styles/Header.css';
 
 const Header = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [isInvitesOpen, setIsInvitesOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [newInvitesCount, setNewInvitesCount] = useState(0);
+  const invitesBtnRef = useRef(null);
   const notificationBtnRef = useRef(null);
 
   const handleLogout = async () => {
     await logout();
     navigate('/login');
+  };
+
+  // Загружаем количество новых приглашений
+  useEffect(() => {
+    const loadNewCount = async () => {
+      try {
+        const { data } = await invitesAPI.getList({ status: 'PENDING', page: 0, pageSize: 100 });
+        const viewedIds = JSON.parse(localStorage.getItem('viewedInvites') || '[]');
+        const currentUserId = user?.currentUser?.id || user?.id;
+        
+        const filtered = Array.isArray(data)
+          ? data.filter(inv => {
+              const ownerId = inv.meetingId?.owner?.id;
+              return ownerId !== currentUserId && !viewedIds.includes(inv.id);
+            })
+          : [];
+        
+        setNewInvitesCount(filtered.length);
+      } catch (error) {
+        // тихо
+      }
+    };
+
+    if (user) {
+      loadNewCount();
+      // Обновлять каждые 30 секунд
+      const interval = setInterval(loadNewCount, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [user]);
+
+  // При открытии модалки — сбрасываем счётчик
+  const handleInvitesOpen = () => {
+    setIsInvitesOpen(true);
+  };
+
+  const handleInvitesClose = () => {
+    setIsInvitesOpen(false);
+    setNewInvitesCount(0);
   };
 
   return (
@@ -27,11 +71,18 @@ const Header = () => {
       </div>
       
       <div className="header-right">
-        <button className="invitations-btn">
+        <button 
+          className="invitations-btn"
+          ref={invitesBtnRef}
+          onClick={handleInvitesOpen}
+        >
           <img 
             src="/src/assets/invitations.svg" 
             alt="Invitations"
           />
+          {newInvitesCount > 0 && (
+            <span className="badge">{newInvitesCount}</span>
+          )}
         </button>
 
         <button 
@@ -58,6 +109,12 @@ const Header = () => {
           </button>
         </div>
       </div>
+
+      <InvitesModal 
+        isOpen={isInvitesOpen}
+        onClose={handleInvitesClose}
+        anchorRef={invitesBtnRef}
+      />
 
       <NotificationsModal 
         isOpen={isNotificationsOpen}

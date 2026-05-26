@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../styles/TimePicker.css";
 
-const TimePicker = ({ options, onChange }) => {
+const TimePicker = ({ options, onChange, className, style }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const containerRef = useRef(null);
@@ -59,12 +59,13 @@ const TimePicker = ({ options, onChange }) => {
     <div className="timepicker-container" ref={containerRef}>
       <input
         type="text"
-        className="timepicker-input"
+        className={`timepicker-input ${className || ''}`}
         value={inputValue}
         onChange={handleInputChange}
         onFocus={handleFocus}
         placeholder="00:00"
         autoComplete="off"
+        style={style}
       />
       {isOpen && filteredOptions.length > 0 && (
         <ul className="timepicker-list">

@@ -22,12 +22,14 @@ body * {
   background-color: #353535;
   border-radius: 15px;
 }
+
 .input-content {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
+
 .event-title-input {
   height: 49px;
   width: 450px;
@@ -52,6 +54,7 @@ body * {
 .event-title-input:hover {
   border-bottom-color: #fbb564;
 }
+
 .event-title-input:focus {
   border-bottom-color: #fbb564;
 }
@@ -77,11 +80,13 @@ body * {
   font-weight: 400;
   font-size: 24px;
 }
+
 .event-discription-input:focus {
   outline: 2px solid #fbb564;
 }
+
 .event-discription-input:hover {
-   outline: 2px solid #fbb564;
+  outline: 2px solid #fbb564;
 }
 
 .icon-time {
@@ -90,10 +95,13 @@ body * {
   margin-left: 32px;
   margin-top: 20px;
 }
+
 .inputs-row {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
 }
+
 .time-separator {
   color: white;
   font-size: 36px;
@@ -124,12 +132,12 @@ body * {
   border: none;
   box-shadow: none;
   margin-right: 5px;
-  outline: none; /* не нужен outline по умолчанию */
+  outline: none;
 }
 
 .user-input:hover,
 .user-input:focus {
-  outline: 2px solid #fbb564; /* здесь задаём кастомный outline */
+  outline: 2px solid #fbb564;
 }
 
 .user-input::placeholder {
@@ -158,6 +166,7 @@ body * {
   background-color: #fbb564;
   color: white;
 }
+
 .add-button:active {
   background-color: #f8cfa1;
 }
@@ -182,6 +191,7 @@ body * {
 .datepicker-input:focus {
   outline: 2px solid #fbb564;
 }
+
 .event-calendar {
   background-color: #2c2c2c;
   color: white;
@@ -190,9 +200,11 @@ body * {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   font-family: "Open Sans", sans-serif;
 }
+
 .event-calendar .react-datepicker__month-container {
   background-color: #2c2c2c;
 }
+
 .event-calendar .react-datepicker__day-name {
   color: white !important;
 }
@@ -256,8 +268,6 @@ body * {
   display: flex;
   align-items: center;
   font-size: 12px;
-  
-  
 }
 
 .remove-tag {
@@ -268,6 +278,7 @@ body * {
   margin-left: 8px;
   cursor: pointer;
 }
+
 .remove-tag:hover {
   color: red;
 }
@@ -294,11 +305,10 @@ body * {
   font-family: "Open Sans", sans-serif;
   font-size: 32px;
   font-weight: 600;
-  z-index: 10; /* на всякий случай */
+  z-index: 10;
 }
 
-
-.event-create:hover{
+.event-create:hover {
   background-color: #fbb564;
 }
 
@@ -323,17 +333,85 @@ body * {
   color: #fff;
   transform: rotate(90deg);
 }
-.field-hint {
-  color: #ff4757;
-  font-size: 12px;
-  font-weight: 500;
-  display: block;
-  text-align: left;
-  padding-left: 4px;
-  margin-top: -5px;
-  margin-bottom: 8px;
+
+/* ===== АВТОКОМПЛИТ ===== */
+.autocomplete-wrapper {
+  position: relative;
+  flex: 1;
 }
 
+.suggestions-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #2b2b2b;
+  border: 1px solid #4e453d;
+  border-radius: 0 0 12px 12px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 100;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.suggestion-item:hover {
+  background: #3e3731;
+}
+
+.suggestion-username {
+  color: #fbb564;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.suggestion-email {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+}
+
+/* Скроллбар для списка подсказок */
+.suggestions-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.suggestions-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 0 0 10px 0;
+}
+
+.suggestions-list::-webkit-scrollbar-thumb {
+  background: #fbb564;
+  border-radius: 10px;
+}
+
+.suggestions-list::-webkit-scrollbar-thumb:hover {
+  background: #ffc87c;
+}
+
+.suggestions-list {
+  scrollbar-width: thin;
+  scrollbar-color: #fbb564 rgba(255, 255, 255, 0.03);
+}
+
+/* ===== ОШИБКИ — КРАСНАЯ ОБВОДКА ===== */
 .input-error {
+  outline: 2px solid #ff4757 !important;
   border-color: #ff4757 !important;
+}
+
+/* Нижнее подчёркивание для названия (border-bottom) */
+.event-title-input.input-error {
+  border-bottom-color: #ff4757 !important;
+  outline: none !important;
 }

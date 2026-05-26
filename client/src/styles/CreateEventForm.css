@@ -337,3 +337,81 @@ body * {
 .input-error {
   border-color: #ff4757 !important;
 }
+.input-error {
+  outline: 2px solid #ff4757 !important;
+  border-color: #ff4757 !important;
+}
+
+.event-title-input.input-error {
+  border-bottom-color: #ff4757 !important;
+  outline: none !important;
+}
+/* ===== АВТОКОМПЛИТ ===== */
+.autocomplete-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+.suggestions-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #2b2b2b;
+  border: 1px solid #4e453d;
+  border-radius: 0 0 12px 12px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 100;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.suggestion-item:hover {
+  background: #3e3731;
+}
+
+.suggestion-username {
+  color: #fbb564;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.suggestion-email {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+}
+
+/* Скроллбар */
+.suggestions-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.suggestions-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 0 0 10px 0;
+}
+
+.suggestions-list::-webkit-scrollbar-thumb {
+  background: #fbb564;
+  border-radius: 10px;
+}
+
+.suggestions-list::-webkit-scrollbar-thumb:hover {
+  background: #ffc87c;
+}
+
+.suggestions-list {
+  scrollbar-width: thin;
+  scrollbar-color: #fbb564 rgba(255, 255, 255, 0.03);
+}

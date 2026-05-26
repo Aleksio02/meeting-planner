@@ -15,8 +15,12 @@ export default defineConfig({
         target: 'http://localhost:8082',
         changeOrigin: true,
       },
-      '/api/events': {
+      '/api/invites': {
         target: 'http://localhost:8082',
+        changeOrigin: true,
+      },
+      '/api/users': {
+        target: 'http://localhost:8081',
         changeOrigin: true,
       },
     },

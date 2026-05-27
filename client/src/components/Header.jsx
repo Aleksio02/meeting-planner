@@ -54,11 +54,6 @@ const Header = ({ onRefreshMeetings }) => {
     if (onRefreshMeetings) onRefreshMeetings();
   };
 
-  const handleLogout = async () => {
-    await logout();
-    navigate('/login');
-  };
-
   return (
     <header className="header">
       <div className="header-left">

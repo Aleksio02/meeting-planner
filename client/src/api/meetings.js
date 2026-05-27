@@ -1,7 +1,6 @@
 import api from './axios';
 
 export const meetingsAPI = {
-  // Убираем /api/ из путей — baseURL уже содержит /api
   create: (data) => api.post('/meetings', data),
   getList: (params) => api.get('/meetings', { params }),
   getById: (id) => api.get(`/meetings/${id}`),

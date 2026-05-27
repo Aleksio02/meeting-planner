@@ -1,5 +1,6 @@
 package ru.epta.mtplanner.meeting.model.request;
 
+import java.util.Collections;
 import lombok.Getter;
 import lombok.Setter;
 import ru.epta.mtplanner.meeting.model.enums.MeetingStatus;
@@ -17,6 +18,7 @@ public class CreateMeetingRequest {
     private UUID ownerId;
     private LocalDateTime startsAt;
     private Integer duration;
-    private List<UUID> invitedUserIds;
+    private MeetingStatus status;
+    private List<UUID> invitedUserIds = Collections.emptyList();
 
 }

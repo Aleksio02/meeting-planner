@@ -86,7 +86,6 @@ class MeetingServiceImplTest {
         request.setDescription(description);
         request.setStartsAt(startsAt);
         request.setDuration(duration);
-        request.setStatus(status);
         return request;
     }
 

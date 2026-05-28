@@ -24,4 +24,6 @@ public interface MeetingService {
 
     Meeting cancelMeeting(UUID id, CancelMeetingRequest request, UUID currentUserId);
 
+    Meeting completeMeeting(UUID id, UUID currentUserId);
+
 }

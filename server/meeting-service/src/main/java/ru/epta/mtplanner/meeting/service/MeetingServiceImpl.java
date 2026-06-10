@@ -101,7 +101,7 @@ public class MeetingServiceImpl implements MeetingService {
         MeetingDto meetingDto = new MeetingDto();
         meetingDto.setTitle(request.getTitle());
         meetingDto.setDescription(request.getDescription());
-        meetingDto.setStartsAt(LocalDateTime.now());
+        meetingDto.setStartsAt(request.getStartsAt());
         meetingDto.setDuration(request.getDuration());
         meetingDto.setStatus(MeetingStatus.PLANNED);
 

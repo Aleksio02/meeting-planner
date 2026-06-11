@@ -14,8 +14,12 @@ export const AuthProvider = ({ children }) => {
     const checkSession = async () => {
       try {
         const response = await authAPI.validateSession();
-        setUser(response.data.user);
+        // Бекенд возвращает данные по-разному — проверяем все варианты
+        const userData = response.data?.currentUser || response.data?.user || response.data;
+        console.log('Сессия валидна:', userData);
+        setUser(userData);
       } catch (error) {
+        console.log('Сессия невалидна');
         setUser(null);
       } finally {
         setLoading(false);
@@ -26,22 +30,17 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (loginValue, password) => {
     const response = await authAPI.login({ login: loginValue, password });
-    setUser(response.data.user);
+    const userData = response.data?.currentUser || response.data?.user || response.data;
+    setUser(userData);
     return response;
   };
 
   const logout = async () => {
-    try {
-      await authAPI.logout();
-    } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      setUser(null);
-    }
+    setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, isAuthenticated: !!user }}>
       {children}
     </AuthContext.Provider>
   );

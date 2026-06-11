@@ -15,7 +15,7 @@ body {
 .register-card {
   position: relative;
   width: 377px;
-  height: 500px;
+  min-height: 500px;
   background-color: #2b2b2b;
   border-radius: 25px;
   padding: 20px;
@@ -106,6 +106,7 @@ body {
 .register-footer-link:hover {
   color: #fbb564;
 }
+
 /* Обёртка для инпута + подсказки */
 .input-group {
   width: 326px;

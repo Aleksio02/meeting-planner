@@ -39,8 +39,9 @@ const HomePage = () => {
       const mappedEvents = meetingsData.map(meeting => ({
         id: meeting.id,
         title: meeting.title,
+        date: meeting.startsAt ? new Date(meeting.startsAt).toISOString().split('T')[0] : '',
         startTime: meeting.startsAt ? new Date(meeting.startsAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) : '',
-        endTime: meeting.startsAt && meeting.duration ? new Date(new Date(meeting.startsAt).getTime() + meeting.duration * 60000).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) : '',
+        endTime: meeting.duration ? new Date(new Date(meeting.startsAt).getTime() + meeting.duration * 60000).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) : '',
         description: meeting.description,
         isMyEvent: meeting.owner?.id === currentUserId,
         status: meeting.status,
@@ -76,12 +77,35 @@ const HomePage = () => {
 
   const handleSaveEdit = async (eventData) => {
     try {
-      await meetingsAPI.update(eventData.id, eventData);
-      setEvents(prev => prev.map(ev => (ev.id === eventData.id ? { ...ev, ...eventData } : ev)));
-      setIsEditOpen(false); setSelectedEventId(null);
-      addToast('✅ Изменения сохранены!', 'success', 3000);
+      const updateData = {};
+      if (eventData.title) updateData.title = eventData.title;
+      if (eventData.description !== undefined) updateData.description = eventData.description;
+      
+      // Если изменили дату и время — формируем startsAt и duration
+      if (eventData.date && eventData.startTime && eventData.endTime) {
+        updateData.startsAt = `${eventData.date}T${eventData.startTime}:00`;
+        const [sh, sm] = eventData.startTime.split(':').map(Number);
+        const [eh, em] = eventData.endTime.split(':').map(Number);
+        updateData.duration = (eh * 60 + em) - (sh * 60 + sm);
+      }
+      
+      await meetingsAPI.update(eventData.id, updateData);
+      
+      setEvents(prev => prev.map(ev => (ev.id === eventData.id ? { 
+        ...ev, 
+        title: eventData.title || ev.title,
+        description: eventData.description !== undefined ? eventData.description : ev.description,
+        date: eventData.date || ev.date,
+        startTime: eventData.startTime || ev.startTime,
+        endTime: eventData.endTime || ev.endTime,
+      } : ev)));
+      
+      setIsEditOpen(false);
+      setSelectedEventId(null);
+      addToast(' Изменения сохранены!', 'success', 3000);
     } catch (error) {
-      addToast('❌ Ошибка при сохранении', 'error', 6000);
+      const msg = error.response?.data?.errorMessage || 'Ошибка при сохранении';
+      addToast(` ${msg}`, 'error', 6000);
     }
   };
 

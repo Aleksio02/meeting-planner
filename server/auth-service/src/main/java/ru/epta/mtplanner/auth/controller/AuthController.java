@@ -35,7 +35,10 @@ public class AuthController {
     }
 
     @GetMapping("/validateSession")
-    public TokenPayload validateSession(@CookieValue(name = "sessionId", required = false) String sessionId) {
-        return authService.validateSession(sessionId);
+    public TokenPayload validateSession(@CookieValue(name = "sessionId", required = false) String sessionId,
+                                        HttpServletResponse response) {
+        TokenPayload tokenPayload = authService.validateSession(sessionId);
+        sessionUtils.writeSessionCookie(response, sessionId);
+        return tokenPayload;
     }
 }

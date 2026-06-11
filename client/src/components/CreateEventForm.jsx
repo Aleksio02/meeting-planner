@@ -91,16 +91,22 @@ const CreateEventForm = ({ onClose, onCreated }) => {
 
   const handleSubmit = async () => {
     if (!validate()) { addToast('Заполните обязательные поля', 'error'); return; }
+    
     const [startHour, startMin] = startTime.split(':').map(Number);
     const [endHour, endMin] = endTime.split(':').map(Number);
     const durationMinutes = (endHour * 60 + endMin) - (startHour * 60 + startMin);
     const invitedUserIds = participants.map(p => p.id);
+    
+    // LocalDateTime: "2026-06-11T09:00:00"
+    const startsAt = `${formatDate(selectedDate)}T${startTime}:00`;
 
     const meetingData = {
-      title: title.trim(), description: description.trim(),
-      date: formatDate(selectedDate), startTime, endTime,
-      duration: durationMinutes, participants: [],
-      invitedUserIds, status: "PLANNED",
+      title: title.trim(),
+      description: description.trim(),
+      startsAt: startsAt,
+      duration: durationMinutes,
+      invitedUserIds,
+      status: "PLANNED",
     };
 
     setLoading(true);
@@ -109,10 +115,10 @@ const CreateEventForm = ({ onClose, onCreated }) => {
       addToast('✅ Встреча создана!', 'success', 3000);
       if (onCreated) {
         onCreated({
-          id: data.id, title: data.title,
-          date: data.date || formatDate(selectedDate),
-          startTime: data.startTime || startTime,
-          endTime: data.endTime || endTime,
+          id: data.id,
+          title: data.title,
+          startTime: startTime,
+          endTime: endTime,
           description: data.description || description,
           isMyEvent: true,
           participants: participants.map(p => p.username),

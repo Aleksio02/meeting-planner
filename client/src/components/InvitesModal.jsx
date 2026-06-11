@@ -69,12 +69,12 @@ const InvitesModal = ({ isOpen, onClose, anchorRef, onAccepted }) => {
   const handleAccept = async (id) => {
     try {
       await invitesAPI.accept(id);
-      addToast('✅ Приглашение принято!', 'success', 2000);
+      addToast(' Приглашение принято!', 'success', 2000);
       setInvites(prev => prev.filter(inv => inv.id !== id));
       if (onAccepted) setTimeout(() => onAccepted(), 500);
     } catch (error) {
       console.error('Ошибка принятия:', error);
-      addToast('❌ Ошибка при принятии', 'error');
+      addToast(' Ошибка при принятии', 'error');
     }
   };
 

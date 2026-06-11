@@ -7,4 +7,5 @@ export const meetingsAPI = {
   update: (id, data) => api.patch(`/meetings/${id}`, data),
   delete: (id) => api.delete(`/meetings/${id}`),
   cancel: (id, data) => api.patch(`/meetings/${id}/cancel`, data),
+  
 };

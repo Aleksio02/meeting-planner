@@ -1,6 +1,7 @@
 package ru.epta.mtplanner.meeting.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import java.time.temporal.ChronoUnit;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,6 +34,7 @@ import ru.epta.mtplanner.meeting.model.enums.MeetingStatus;
 import ru.epta.mtplanner.meeting.model.request.*;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -101,13 +103,17 @@ public class MeetingServiceImpl implements MeetingService {
         MeetingDto meetingDto = new MeetingDto();
         meetingDto.setTitle(request.getTitle());
         meetingDto.setDescription(request.getDescription());
-        meetingDto.setStartsAt(LocalDateTime.now());
+        meetingDto.setStartsAt(request.getStartsAt());
         meetingDto.setDuration(request.getDuration());
-        meetingDto.setStatus(request.getStatus());
+        meetingDto.setStatus(MeetingStatus.PLANNED);
 
         UserDto owner = userDao.findById(currentId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found: " + currentId));
         meetingDto.setOwnerId(owner);
+
+        if (meetingDto.getStartsAt().isBefore(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES))) {
+            throw new IncorrectRequestDataException("Cannot create meeting in the past");
+        }
 
         MeetingDto savedMeeting = meetingDao.save(meetingDto);
 
@@ -160,6 +166,7 @@ public class MeetingServiceImpl implements MeetingService {
 
         request.getStartsAt().ifPresent(startsAt -> {
             meetingDto.setStartsAt(startsAt);
+            meetingDto.setStatus(MeetingStatus.POSTPONED);
             isStartDateChanged[0] = true;
 
         });
@@ -179,8 +186,6 @@ public class MeetingServiceImpl implements MeetingService {
             isDetailsChanged[0] = true;
         });
 
-        request.getStatus().ifPresent(status -> meetingDto.setStatus(status));
-
         if (!isDetailsChanged[0] && !isStartDateChanged[0]) {
             throw new IncorrectRequestDataException("No changes detected");
         }
@@ -193,11 +198,9 @@ public class MeetingServiceImpl implements MeetingService {
 
         List<InviteDto> participants = inviteDao.findAllByMeetingIdAndStatus(meetingDto.getId(), InviteStatus.ACCEPTED);
 
-        List<UUID> receivers = new ArrayList<>(participants.size());
-        participants.stream()
+        List<UUID> receivers = participants.stream()
                 .map(inv -> inv.getUser().getId())
-                .forEach(receivers::add);
-
+                .toList();
 
         if (isDetailsChanged[0]) {
             notificationKafkaProducer.sendNotification(meetingConverter.toNotification(meeting, NotificationType.UPDATE_MEETING_DETAILS, null, receivers));
@@ -247,4 +250,37 @@ public class MeetingServiceImpl implements MeetingService {
         return meeting;
     }
 
+    @Override
+    @Transactional
+    public Meeting completeMeeting(UUID id, UUID currentUserId) {
+        MeetingDto meetingDto = meetingDao.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Meeting not found with id: " + id));
+
+        UUID ownerId = meetingDto.getOwnerId().getId();
+
+        if (!currentUserId.equals(ownerId)) {
+            throw new AccessForbiddenException("You are not the owner of the meeting. Only the meeting owner can complete it.");
+        }
+
+        if (meetingDto.getStatus() == MeetingStatus.COMPLETED) {
+            throw new IllegalStateException("Meeting is already completed");
+        }
+
+        meetingDto.setStatus(MeetingStatus.COMPLETED);
+
+        MeetingDto completedMeeting = meetingDao.save(meetingDto);
+
+        Meeting meeting = new Meeting();
+        MeetingConverter meetingConverter = new MeetingConverter();
+        meetingConverter.fromDto(completedMeeting, meeting);
+
+        List<InviteDto> participants = inviteDao.findAllByMeetingIdAndStatus(meetingDto.getId(), InviteStatus.ACCEPTED);
+        List<UUID> receivers = participants.stream()
+                .map(inv -> inv.getUser().getId())
+                .toList();
+
+        notificationKafkaProducer.sendNotification(meetingConverter.toNotification(meeting, NotificationType.COMPLETE_MEETING, null, receivers));
+
+        return meeting;
+    }
 }

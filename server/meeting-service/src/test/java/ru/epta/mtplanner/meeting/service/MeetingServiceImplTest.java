@@ -86,7 +86,6 @@ class MeetingServiceImplTest {
         request.setDescription(description);
         request.setStartsAt(startsAt);
         request.setDuration(duration);
-        request.setStatus(status);
         return request;
     }
 
@@ -171,7 +170,7 @@ class MeetingServiceImplTest {
         UUID currentId = UUID.randomUUID();
         UserDto owner = buildUserDto(currentId, "Bob");
         CreateMeetingRequest request = buildCreateRequest("Sprint", "Sprint planning",
-            LocalDateTime.of(2026, 6, 1, 9, 0), 90, MeetingStatus.PLANNED
+                LocalDateTime.now().plusDays(1).withHour(9).withMinute(0), 90, MeetingStatus.PLANNED
         );
         MeetingDto savedDto = buildMeetingDto(UUID.randomUUID(), "Sprint", owner);
 

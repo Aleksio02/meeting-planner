@@ -150,7 +150,7 @@ const RegisterForm = () => {
         password: formData.password,
       });
 
-      addToast('✅ Регистрация успешна! Перенаправляем...', 'success', 3000);
+      addToast(' Регистрация успешна! Перенаправляем...', 'success', 3000);
 
       setTimeout(() => {
         navigate('/login');

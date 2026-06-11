@@ -1,6 +1,7 @@
 package ru.epta.mtplanner.meeting.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import java.time.temporal.ChronoUnit;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -108,6 +109,10 @@ public class MeetingServiceImpl implements MeetingService {
         UserDto owner = userDao.findById(currentId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found: " + currentId));
         meetingDto.setOwnerId(owner);
+
+        if (meetingDto.getStartsAt().isBefore(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES))) {
+            throw new IncorrectRequestDataException("Cannot create meeting in the past");
+        }
 
         MeetingDto savedMeeting = meetingDao.save(meetingDto);
 

@@ -112,7 +112,7 @@ const CreateEventForm = ({ onClose, onCreated }) => {
     setLoading(true);
     try {
       const { data } = await meetingsAPI.create(meetingData);
-      addToast('✅ Встреча создана!', 'success', 3000);
+      addToast(' Встреча создана!', 'success', 3000);
       if (onCreated) {
         onCreated({
           id: data.id,

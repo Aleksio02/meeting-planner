@@ -102,10 +102,10 @@ const HomePage = () => {
       
       setIsEditOpen(false);
       setSelectedEventId(null);
-      addToast('✅ Изменения сохранены!', 'success', 3000);
+      addToast(' Изменения сохранены!', 'success', 3000);
     } catch (error) {
       const msg = error.response?.data?.errorMessage || 'Ошибка при сохранении';
-      addToast(`❌ ${msg}`, 'error', 6000);
+      addToast(` ${msg}`, 'error', 6000);
     }
   };
 

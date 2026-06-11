@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { meetingsAPI } from '../api/meetings';
 import { invitesAPI } from '../api/invites';
 import { usersAPI } from '../api/users';
+import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import InviteModal from './InviteModal';
 import '../styles/EventView.css';
 
 const EventView = ({ isOpen, onClose, eventId }) => {
+  const { user } = useAuth();
   const { addToast } = useToast();
   const [isClosing, setIsClosing] = useState(false);
   const [shouldRender, setShouldRender] = useState(false);
@@ -15,6 +17,9 @@ const EventView = ({ isOpen, onClose, eventId }) => {
   const [event, setEvent] = useState(null);
   const [participants, setParticipants] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const currentUserId = user?.currentUser?.id || user?.id;
+  const isOwner = event?.ownerId === currentUserId;
 
   useEffect(() => {
     if (isOpen) {
@@ -122,7 +127,9 @@ const EventView = ({ isOpen, onClose, eventId }) => {
                 {!showAllParticipants && remainingCount > 0 && <button className="participant-pill more-btn" onClick={() => setShowAllParticipants(true)}>и ещё {remainingCount}...</button>}
                 {showAllParticipants && participants.length > 5 && <button className="participant-pill more-btn" onClick={() => setShowAllParticipants(false)}>Скрыть</button>}
               </div>
-              <button className="invite-trigger-btn" onClick={() => setIsInviteOpen(true)}>+ Пригласить участника</button>
+              {isOwner && (
+                <button className="invite-trigger-btn" onClick={() => setIsInviteOpen(true)}>+ Пригласить участника</button>
+              )}
             </div>
             <div className="creator-section"><span className="section-label">Организатор</span><span className="creator-name">{event.creator}</span></div>
             <div className="event-action"><button className="leave-btn">Покинуть событие</button></div>
